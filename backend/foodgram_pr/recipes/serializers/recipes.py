@@ -21,14 +21,12 @@ COOKING_TIME_ERROR = (
 )
 COOKING_TIME_MIN = 1
 INGREDIENT_MIN_AMOUNT = 1
-TAGS_UNIQUE_ERROR = 'Теги не могут повторяться!'
 TAGS_EMPTY_ERROR = 'Рецепт не может быть без тегов!'
 INGREDIENTS_UNIQUE_ERROR = 'Ингредиенты не могут повторяться!'
 INGREDIENTS_EMPTY_ERROR = 'Без ингредиентов рецепта не бывает!'
 INGREDIENT_MIN_AMOUNT_ERROR = (
     'Количество ингредиента не может быть меньше 1!'
 )
-INGREDIENT_DOES_NOT_EXIST = 'Такого ингредиента не существует!'
 
 
 class RecipeIngredientsSerializer(ModelSerializer):
@@ -131,7 +129,7 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
     def validate_tags(self, value):
         if not value:
             raise ValidationError(
-                'Нужно добавить хотя бы один тег.'
+                TAGS_EMPTY_ERROR
             )
 
         return value
@@ -139,14 +137,14 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
     def validate_ingredients(self, value):
         if not value:
             raise ValidationError(
-                'Нужно добавить хотя бы один ингредиент.'
+                INGREDIENTS_EMPTY_ERROR
             )
 
         ingredients = [item['id'] for item in value]
         for ingredient in ingredients:
             if ingredients.count(ingredient) > 1:
                 raise ValidationError(
-                    'Ингредиенты не могут повторятся!'
+                    INGREDIENTS_UNIQUE_ERROR
                 )
 
         return value
