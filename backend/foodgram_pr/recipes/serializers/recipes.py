@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from ingredients.models import Ingredient
@@ -17,16 +17,22 @@ from ..models import (Favorite, Recipe, RecipeIngredients, RecipeTags,
 User = get_user_model()
 
 COOKING_TIME_ERROR = (
-    'Время приготовления не может быть меньше одной минуты!'
+    'Время приготовления должно составлять не менее 1 минуты',
+    ' и не превышать 32 000 минут'
 )
 COOKING_TIME_MIN = 1
+MAX_COOKING_TIME = 32000
 INGREDIENT_MIN_AMOUNT = 1
+INGREDIENT_MAX_AMOUNT = 32000
 TAGS_EMPTY_ERROR = 'Рецепт не может быть без тегов!'
 INGREDIENTS_UNIQUE_ERROR = 'Ингредиенты не могут повторяться!'
 INGREDIENTS_EMPTY_ERROR = 'Без ингредиентов рецепта не бывает!'
 INGREDIENT_MIN_AMOUNT_ERROR = (
     'Количество ингредиента не может быть меньше 1!'
 )
+INGREDIENT_MAX_AMOUNT_ERROR = (
+    'Количество ингредиента не может быть больше 32000!'
+    )
 
 
 class RecipeIngredientsSerializer(ModelSerializer):
@@ -55,8 +61,12 @@ class CreateUpdateRecipeIngredientsSerializer(ModelSerializer):
     amount = IntegerField(
         validators=(
             MinValueValidator(
-                1,
+                INGREDIENT_MIN_AMOUNT,
                 message=INGREDIENT_MIN_AMOUNT_ERROR
+            ),
+            MaxValueValidator(
+                INGREDIENT_MAX_AMOUNT,
+                message=INGREDIENT_MAX_AMOUNT_ERROR
             ),
         )
     )
@@ -87,19 +97,25 @@ class RecipeSerializer(ModelSerializer):
 
     def get_is_favorited(self, obj):
         user = self.context['request'].user
-
         if user.is_anonymous:
             return False
 
-        return Favorite.objects.filter(user=user, recipe=obj).exists()
+        if not hasattr(obj, 'pk'):
+            return False
+        if Favorite.objects.filter(user=user, recipe=obj).exists():
+            return True
+
+        return False
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context['request'].user
-
         if user.is_anonymous:
             return False
-
-        return ShoppingCart.objects.filter(user=user, recipe=obj).exists()
+        if not hasattr(obj, 'pk'):
+            return False
+        if ShoppingCart.objects.filter(user=user, recipe=obj).exists():
+            return True
+        return False
 
     class Meta:
         model = Recipe
@@ -120,11 +136,14 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
     cooking_time = IntegerField(
         validators=(
             MinValueValidator(
-                1,
+                COOKING_TIME_MIN,
                 message=COOKING_TIME_ERROR
             ),
+            MaxValueValidator(
+                MAX_COOKING_TIME,
+                message=COOKING_TIME_ERROR)
+            )
         )
-    )
 
     def validate_tags(self, value):
         if not value:
@@ -139,14 +158,6 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
             raise ValidationError(
                 INGREDIENTS_EMPTY_ERROR
             )
-
-        ingredients = [item['id'] for item in value]
-        for ingredient in ingredients:
-            if ingredients.count(ingredient) > 1:
-                raise ValidationError(
-                    INGREDIENTS_UNIQUE_ERROR
-                )
-
         return value
 
     def create(self, validated_data):
@@ -167,32 +178,34 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
             )
         return recipe
 
-    def add_ingredients(self, recipe, ingredients):
-        for ingredient_data in ingredients:
-            ingredient = Ingredient.objects.create(**ingredient_data)
-            RecipeIngredients.objects.create(
-                recipe=recipe,
-                ingredient=ingredient
-                )
-
     def add_tags(self, recipe, tags):
-        for tag_data in tags:
-            tag = Tag.objects.create(**tag_data)
-            RecipeTags.objects.create(recipe=recipe, tag=tag)
+        tag_objs = [Tag(**data) for data in tags]
+        Tag.objects.bulk_create(tag_objs)
+        recipe_tags = [RecipeTags(recipe=recipe, tag=tag) for tag in tag_objs]
+        RecipeTags.objects.bulk_create(recipe_tags)
+
+    def add_ingredients(self, recipe, ingredients):
+        ingredient_objs = [Ingredient(**data) for data in ingredients]
+        Ingredient.objects.bulk_create(ingredient_objs)
+        recipe_ingredients = [RecipeIngredients(
+            recipe=recipe,
+            ingredient=ingredient
+            ) for ingredient in ingredient_objs]
+        RecipeIngredients.objects.bulk_create(recipe_ingredients)
 
     def update(self, instance, validated_data):
         tags = validated_data.pop('tags', None)
         if tags is not None:
+            self.add_tags(instance, tags)
             instance.tags.set(tags)
 
         ingredients = validated_data.pop('ingredients', None)
         if ingredients is not None:
+            self.add_ingredients(instance, ingredients)
             instance.ingredients.clear()
-
             for ingredient in ingredients:
                 amount = ingredient['amount']
                 ingredient = get_object_or_404(Ingredient, pk=ingredient['id'])
-
                 RecipeIngredients.objects.update_or_create(
                     recipe=instance,
                     ingredient=ingredient,

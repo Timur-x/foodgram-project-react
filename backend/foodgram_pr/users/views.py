@@ -36,9 +36,9 @@ class UserSubscribeViewSet(UserViewSet):
     )
     def subscriptions(self, request):
         user = self.request.user
-        user_subscriptions = user.subscribes.all()
-        authors = [item.author.id for item in user_subscriptions]
-        queryset = User.objects.filter(pk__in=authors)
+
+        def queryset():
+            return User.objects.filter(subscriber__user=user)
         paginated_queryset = self.paginate_queryset(queryset)
         serializer = self.get_serializer(paginated_queryset, many=True)
 
@@ -54,26 +54,13 @@ class UserSubscribeViewSet(UserViewSet):
         author = get_object_or_404(User, pk=id)
 
         if self.request.method == 'POST':
-            if user == author:
-                raise exceptions.ValidationError(
-                    'Подписка на самого себя запрещена.'
-                )
-            if Subscription.objects.filter(
-                user=user,
-                author=author
-            ).exists():
-                raise exceptions.ValidationError('Подписка уже оформлена.')
-
             Subscription.objects.create(user=user, author=author)
             serializer = self.get_serializer(author)
 
             return Response(serializer.data, status=HTTP_201_CREATED)
 
         if self.request.method == 'DELETE':
-            if not Subscription.objects.filter(
-                user=user,
-                author=author
-            ).exists():
+            if not user.subscribers.filter(author=author).exists():
                 raise exceptions.ValidationError(
                     'Подписка не была оформлена, либо уже удалена.'
                 )

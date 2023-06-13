@@ -74,34 +74,22 @@ class RecipeViewSet(viewsets.ModelViewSet):
         user = self.request.user
         recipe = get_object_or_404(Recipe, pk=pk)
         if self.request.method == 'POST':
-            if Favorite.objects.filter(
-                user=user,
-                recipe=recipe
-            ).exists():
-                raise exceptions.ValidationError('Рецепт уже в избранном.')
-
-            Favorite.objects.create(user=user, recipe=recipe)
+            favorite = Favorite.objects.create(user=user, recipe=recipe)
             serializer = ShortRecipeSerializer(
-                recipe,
+                favorite.recipe,
                 context={'request': request}
             )
 
             return Response(serializer.data, status=HTTP_201_CREATED)
 
         if self.request.method == 'DELETE':
-            if not Favorite.objects.filter(
-                user=user,
-                recipe=recipe
-            ).exists():
+            if not user.in_favorite.filter(recipe=recipe).exists():
                 raise exceptions.ValidationError(
                     'Рецепта нет в избранном, либо он уже удален.'
-                )
-
+                    )
             favorite = get_object_or_404(Favorite, user=user, recipe=recipe)
             favorite.delete()
-
             return Response(status=HTTP_204_NO_CONTENT)
-
         return Response(status=HTTP_405_METHOD_NOT_ALLOWED)
 
     @action(detail=True, methods=('post', 'delete'))
@@ -110,14 +98,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, pk=pk)
 
         if self.request.method == 'POST':
-            if ShoppingCart.objects.filter(
-                user=user,
-                recipe=recipe
-            ).exists():
-                raise exceptions.ValidationError(
-                    'Рецепт уже сушествует списке покупок.'
-                )
-
             ShoppingCart.objects.create(user=user, recipe=recipe)
             serializer = ShortRecipeSerializer(
                 recipe,
@@ -127,10 +107,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=HTTP_201_CREATED)
 
         if self.request.method == 'DELETE':
-            if not ShoppingCart.objects.filter(
-                user=user,
-                recipe=recipe
-            ).exists():
+            if not user.in_shopping_list.filter(recipe=recipe).exists():
                 raise exceptions.ValidationError(
                     'Рецепта нет в списке покупок, либо он уже удален.'
                 )

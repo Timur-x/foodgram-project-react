@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
-
 from ingredients.models import Ingredient
 from tags.models import Tag
 
@@ -74,11 +73,11 @@ class RecipeIngredients(models.Model):
         verbose_name='Ингредиент'
     )
     amount = models.PositiveSmallIntegerField(
-        validators=(MinValueValidator(1),),
         verbose_name='Количество'
     )
 
     class Meta:
+        # ordering = ('ingredient',)
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
 
@@ -150,6 +149,7 @@ class ShoppingCart(models.Model):
     )
 
     class Meta:
+        ordering = ('-user',)
         verbose_name = 'Список'
         verbose_name_plural = 'Список'
 
@@ -172,12 +172,6 @@ class CountOfIngredient(models.Model):
         verbose_name='Ингредиент',
     )
     amount = models.PositiveIntegerField(
-        validators=[
-            MinValueValidator(
-                limit_value=1,
-                message='Количество ингредиентов не может быть меньше 1'
-                )
-        ],
         verbose_name='Количество'
     )
 

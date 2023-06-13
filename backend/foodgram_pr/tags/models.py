@@ -1,4 +1,4 @@
-from django.db.models import CharField, SlugField, Model
+from django.db.models import CharField, Model, SlugField
 
 
 class Tag(Model):
@@ -7,6 +7,7 @@ class Tag(Model):
     slug = SlugField('Уникальный слаг', max_length=200, unique=True)
 
     class Meta:
+        ordering = ('name',)
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
 

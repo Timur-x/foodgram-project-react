@@ -1,7 +1,7 @@
 from django_filters.rest_framework import (AllValuesMultipleFilter,
                                            BooleanFilter, FilterSet)
 
-from .models import Recipe, ShoppingCart
+from .models import Recipe
 
 
 class RecipeFilter(FilterSet):
@@ -16,20 +16,9 @@ class RecipeFilter(FilterSet):
     def get_is_favorited(self, queryset, name, value):
         if not value:
             return queryset
-        favorites = self.request.user.favorites.all()
-        return queryset.filter(
-            pk__in=(favorite.recipe.pk for favorite in favorites)
-        )
+        return queryset.filter(favorites__user=self.request.user)
 
     def get_is_in_shopping_cart(self, queryset, name, value):
         if not value:
             return queryset
-        try:
-            recipes = (
-                self.request.user.shopping_cart.recipes.all()
-            )
-        except ShoppingCart.DoesNotExist:
-            return queryset
-        return queryset.filter(
-            pk__in=(recipe.pk for recipe in recipes)
-        )
+        return queryset.filter(favorites__user=self.request.user)
