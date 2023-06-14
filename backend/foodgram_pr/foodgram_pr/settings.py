@@ -10,7 +10,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', default='django-insecure-hkvr6s0x!02fbey3^r9^$rdfbu+zf!_nzy)_!+e3*x_h(j!lt6')
+SECRET_KEY = os.getenv(
+    'SECRET_KEY',
+    default='django-insecure-hkvr6s0x!02fbey3^r9^$rdfbu+zf!_nzy)_!+e3*x_h(j!lt6')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -69,9 +71,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'foodgram_pr.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.postgresql'),
@@ -107,7 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 
