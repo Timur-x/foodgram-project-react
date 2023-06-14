@@ -42,7 +42,7 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_backend:latest
-          file: backend/foodgram/Dockerfile
+          file: backend/foodgram_pr/Dockerfile
   
       - name: Push frontend image to Docker Hub
         uses: docker/build-push-action@v2
