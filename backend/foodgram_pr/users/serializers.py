@@ -18,12 +18,12 @@ class CustomUserSerializer(UserSerializer):
         author = get_object_or_404(User, pk=id)
         if user == author:
             raise ValidationError(
-                    'Подписка на самого себя запрещена.'
-                )
+                'Подписка на самого себя запрещена.'
+                 )
         if Subscription.objects.filter(
                 user=user,
                 author=author
-                ).exists():
+                 ).exists():
             raise ValidationError('Подписка уже оформлена.')
 
         if user.is_anonymous:

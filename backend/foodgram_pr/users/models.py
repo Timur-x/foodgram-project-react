@@ -29,7 +29,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         'Адрес эл. почты(email)',
         max_length=254,
         unique=True
-        )
+         )
     username = models.CharField('Никнейм', max_length=150)
     first_name = models.CharField('Имя', max_length=150)
     last_name = models.CharField('Фамилия', max_length=150)
