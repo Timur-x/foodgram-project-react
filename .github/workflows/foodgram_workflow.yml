@@ -42,7 +42,7 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/backend:latest
-          context: backend/foodgram_pr/
+          context: ./backend/foodgram_pr/
   
   deploy:
     runs-on: ubuntu-latest
