@@ -42,7 +42,7 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/backend:latest
-          file: backend/foodgram_pr/Dockerfile
+          context: backend/foodgram_pr/Dockerfile
   
   deploy:
     runs-on: ubuntu-latest
