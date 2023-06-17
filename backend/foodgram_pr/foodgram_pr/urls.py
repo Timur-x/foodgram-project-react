@@ -21,7 +21,7 @@ authorization = [
         'token/login/',
         TokenCreateWithCheckBlockStatusView.as_view(), name='login'),
     path('token/logout/', TokenDestroyView.as_view(), name='logout')
-]
+    ]
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router_v1.urls)),
