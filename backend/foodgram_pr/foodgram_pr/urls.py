@@ -10,7 +10,7 @@ from users.views import UserSubscribeViewSet
 
 router_v1 = DefaultRouter()
 router_v1.register('tags', TagViewSet)
-router_v1.register('users', UserSubscribeViewSet, basename='user')
+router_v1.register('users', UserSubscribeViewSet)
 router_v1.register('ingredients', IngredientViewSet)
 router_v1.register('recipes', RecipeViewSet)
 
