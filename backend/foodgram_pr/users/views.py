@@ -18,7 +18,7 @@ class TokenCreateWithCheckBlockStatusView(TokenCreateView):
     def _action(self, serializer):
         if serializer.user.is_blocked:
             return Response(
-                {'errors': 'аккаунт временно заблокирован!'},
+                {'errors': 'аккаунт заблокирован!'},
                 status=HTTP_400_BAD_REQUEST,
             )
         return super()._action(serializer)

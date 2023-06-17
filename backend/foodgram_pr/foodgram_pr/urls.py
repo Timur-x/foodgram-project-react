@@ -18,9 +18,9 @@ router_v1.register('recipes', RecipeViewSet)
 
 authorization = [
     path(
-        'token/login/',
+        'login',
         TokenCreateWithCheckBlockStatusView.as_view(), name='login'),
-    path('token/logout/', TokenDestroyView.as_view(), name='logout')
+    path('logout', TokenDestroyView.as_view(), name='logout')
 ]
 urlpatterns = [
     path('admin/', admin.site.urls),
