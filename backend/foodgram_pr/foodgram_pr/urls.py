@@ -26,7 +26,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router_v1.urls)),
     path('api/auth/', include(authorization))
-    ]
+]
 
 if settings.DEBUG:
     urlpatterns += static(
