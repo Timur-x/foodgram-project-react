@@ -18,15 +18,15 @@ router_v1.register('recipes', RecipeViewSet)
 
 authorization = [
     path(
-        'login',
+        'token/login/',
         TokenCreateWithCheckBlockStatusView.as_view(), name='login'),
-    path('logout', TokenDestroyView.as_view(), name='logout')
+    path('token/logout/', TokenDestroyView.as_view(), name='logout')
 ]
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router_v1.urls)),
     path('api/auth/', include(authorization))
-]
+    ]
 
 if settings.DEBUG:
     urlpatterns += static(
