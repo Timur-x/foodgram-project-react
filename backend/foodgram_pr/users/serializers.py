@@ -22,21 +22,21 @@ class CustomUserSerializer(UserSerializer):
             return Subscription.objects.filter(user=user, author=obj).exists()
         return False
 
-    # def create(self, validated_data):
-    #     validated_data['password'] = make_password(
-    #         validated_data.pop('password'))
-    #     return super().create(validated_data)
+    def create(self, validated_data):
+        validated_data['password'] = make_password(
+            validated_data.pop('password'))
+        return super().create(validated_data)
 
-    # class Meta:
-    #     model = User
-    #     fields = (
-    #         'email',
-    #         'id',
-    #         'username',
-    #         'first_name',
-    #         'last_name',
-    #         'is_subscribed'
-    #          )
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed'
+             )
 
 
 class SubscriptionSerializer(CustomUserSerializer):
