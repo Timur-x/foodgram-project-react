@@ -5,6 +5,8 @@ from .models import Recipe, RecipeIngredients
 
 class RecipeIngredientInline(TabularInline):
     model = RecipeIngredients
+    extra = 1
+    min_num = 1
 
 
 @register(Recipe)
