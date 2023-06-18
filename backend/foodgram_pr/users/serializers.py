@@ -1,4 +1,4 @@
-# from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.models import Recipe
