@@ -20,8 +20,7 @@ class CustomUserSerializer(UserSerializer):
             if Subscription.objects.filter(user=user, author=author).exists():
                 raise ValidationError('Подписка уже оформлена.')
             return Subscription.objects.filter(user=user, author=obj).exists()
-        else:
-            return False
+        return False
 
     # def create(self, validated_data):
     #     validated_data['password'] = make_password(
