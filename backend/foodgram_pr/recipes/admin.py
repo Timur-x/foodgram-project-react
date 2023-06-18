@@ -6,6 +6,7 @@ from .models import Recipe, RecipeIngredients
 class RecipeIngredientInline(TabularInline):
     model = RecipeIngredients
 
+
 @register(Recipe)
 class RecipeAdmin(ModelAdmin):
     list_display = ('name', 'author',)
