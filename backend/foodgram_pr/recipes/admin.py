@@ -1,20 +1,23 @@
 from django.contrib.admin import ModelAdmin, TabularInline, register
 
-from .models import Recipe, RecipeIngredients
+from .models import Recipe
 
 
-class RecipeIngredientInline(TabularInline):
-    model = RecipeIngredients
+class RecipeIngredientsInLine(TabularInline):
+    model = Recipe.ingredients.through
     extra = 1
-    min_num = 1
 
+
+class RecipeTagsInLine(TabularInline):
+    model = Recipe.tags.through
+    extra = 1
 
 @register(Recipe)
 class RecipeAdmin(ModelAdmin):
     list_display = ('name', 'author',)
     list_filter = ('name', 'author', 'tags',)
     readonly_fields = ('in_favorites',)
-    inlines = (RecipeIngredientInline, )
+    inlines = (RecipeIngredientsInLine, RecipeTagsInLine)
 
     def in_favorites(self, obj):
         return obj.favorites.count()
