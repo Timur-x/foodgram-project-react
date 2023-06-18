@@ -1,46 +1,43 @@
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.models import Recipe
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import SerializerMethodField
 
-from .models import Subscription, User
+from .models import Subscription
 
 
 class CustomUserSerializer(UserSerializer):
-    is_subscribed = SerializerMethodField(
-        method_name='get_is_subscribed'
-    )
+    is_subscribed = SerializerMethodField(method_name='get_is_subscribed')
 
     def get_is_subscribed(self, obj):
         user = self.context['request'].user
-        author = get_object_or_404(User, pk=id)
-        if user == author:
-            raise ValidationError(
-                'Подписка на самого себя запрещена.'
-                 )
-        if Subscription.objects.filter(
-                user=user,
-                author=author
-                 ).exists():
-            raise ValidationError('Подписка уже оформлена.')
-
         if user.is_anonymous:
             return False
-
+        author = get_object_or_404(User, pk=obj.id)
+        if user == author:
+            raise ValidationError('Подписка на самого себя запрещена.')
+        if Subscription.objects.filter(user=user, author=author).exists():
+            raise ValidationError('Подписка уже оформлена.')
         return Subscription.objects.filter(user=user, author=obj).exists()
 
     def create(self, validated_data):
-        validated_data['password'] = (
-            make_password(validated_data.pop('password'))
-        )
+        validated_data['password'] = make_password(
+            validated_data.pop('password'))
         return super().create(validated_data)
 
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name',
-                  'is_subscribed')
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed'
+             )
 
 
 class SubscriptionSerializer(CustomUserSerializer):
