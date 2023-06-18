@@ -13,14 +13,15 @@ class CustomUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context['request'].user
-        if user.is_anonymous:
+        if user.is_authenticated:
+            author = get_object_or_404(User, pk=obj.id)
+            if user == author:
+                raise ValidationError('Подписка на самого себя запрещена.')
+            if Subscription.objects.filter(user=user, author=author).exists():
+                raise ValidationError('Подписка уже оформлена.')
+            return Subscription.objects.filter(user=user, author=obj).exists()
+        else:
             return False
-        author = get_object_or_404(User, pk=obj.id)
-        if user == author:
-            raise ValidationError('Подписка на самого себя запрещена.')
-        if Subscription.objects.filter(user=user, author=author).exists():
-            raise ValidationError('Подписка уже оформлена.')
-        return Subscription.objects.filter(user=user, author=obj).exists()
 
     def create(self, validated_data):
         validated_data['password'] = make_password(
