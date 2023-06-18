@@ -1,42 +1,36 @@
 from django.contrib.auth.hashers import make_password
-from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.models import Recipe
-from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import SerializerMethodField
 
-from .models import Subscription, User
+from .models import User
 
 
 class CustomUserSerializer(UserSerializer):
-    is_subscribed = SerializerMethodField(method_name='get_is_subscribed')
-
-    def get_is_subscribed(self, obj):
-        user = self.context['request'].user
-        if user.is_authenticated:
-            author = get_object_or_404(User, pk=obj.id)
-            if user == author:
-                raise ValidationError('Подписка на самого себя запрещена.')
-            if Subscription.objects.filter(user=user, author=author).exists():
-                raise ValidationError('Подписка уже оформлена.')
-            return Subscription.objects.filter(user=user, author=obj).exists()
-        return False
-
-    def create(self, validated_data):
-        validated_data['password'] = make_password(
-            validated_data.pop('password'))
-        return super().create(validated_data)
+    is_subscribed = SerializerMethodField('is_subscribed_user')
 
     class Meta:
         model = User
         fields = (
-            'email',
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'is_subscribed'
-             )
+            'email', 'id', 'username', 'first_name', 'last_name', 'password',
+            'is_subscribed',
+        )
+        extra_kwargs = {
+            'password': {'write_only': True, 'required': True},
+        }
+
+    def is_subscribed_user(self, obj):
+        user = self.context['request'].user
+        return (
+            user.is_authenticated
+            and obj.subscribing.filter(user=user).exists()
+        )
+
+    def create(self, validated_data):
+        validated_data['password'] = (
+            make_password(validated_data.pop('password'))
+        )
+        return super().create(validated_data)
 
 
 class SubscriptionSerializer(CustomUserSerializer):
