@@ -23,10 +23,10 @@ class CustomUserSerializer(UserSerializer):
         else:
             return False
 
-    def create(self, validated_data):
-        validated_data['password'] = make_password(
-            validated_data.pop('password'))
-        return super().create(validated_data)
+    # def create(self, validated_data):
+    #     validated_data['password'] = make_password(
+    #         validated_data.pop('password'))
+    #     return super().create(validated_data)
 
     class Meta:
         model = User
