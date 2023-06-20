@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from djoser.views import TokenCreateView, UserViewSet
+from rest_framework import viewsets
 from rest_framework import exceptions
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -82,3 +83,11 @@ class UserSubscribeViewSet(UserViewSet):
             return Response(status=HTTP_204_NO_CONTENT)
 
         return Response(status=HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class UserMeViewSet(viewsets.ModelViewSet):
+    serializer_class = CustomUserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return self.request.user
