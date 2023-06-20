@@ -8,10 +8,16 @@ from rest_framework.response import Response
 from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
                                    HTTP_400_BAD_REQUEST,
                                    HTTP_405_METHOD_NOT_ALLOWED)
+from rest_framework.pagination import PageNumberPagination
 
 from .models import Subscription, User
-from .pagination import CustomPageNumberPagination
 from .serializers import SubscriptionSerializer
+from .views import CustomUserSerializer
+
+
+class PageNumberPagination(PageNumberPagination):
+    page_size_query_param = 'page_size'
+    max_page_size = 10
 
 
 class TokenCreateWithCheckBlockStatusView(TokenCreateView):
@@ -25,8 +31,10 @@ class TokenCreateWithCheckBlockStatusView(TokenCreateView):
 
 
 class UserSubscribeViewSet(UserViewSet):
+    queryset = User.objects.all()
+    serializer_class = CustomUserSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    pagination_class = CustomPageNumberPagination
+    pagination_class = PageNumberPagination
 
     @action(
         detail=False,
