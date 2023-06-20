@@ -1,7 +1,6 @@
 from django.shortcuts import get_object_or_404
 from djoser.views import TokenCreateView, UserViewSet
-from rest_framework import viewsets
-from rest_framework import exceptions
+from rest_framework import exceptions, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import (IsAuthenticated,

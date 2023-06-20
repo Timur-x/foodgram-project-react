@@ -7,8 +7,8 @@ from ingredients.views import IngredientViewSet
 from recipes.views import RecipeViewSet
 from rest_framework.routers import DefaultRouter
 from tags.views import TagViewSet
-from users.views import (TokenCreateWithCheckBlockStatusView,
-                         UserSubscribeViewSet, UserMeViewSet)
+from users.views import (TokenCreateWithCheckBlockStatusView, UserMeViewSet,
+                         UserSubscribeViewSet)
 
 router_v1 = DefaultRouter()
 router_v1.register('tags', TagViewSet)
