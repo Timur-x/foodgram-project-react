@@ -48,13 +48,11 @@ class SubscriptionSerializer(CustomUserSerializer):
     recipes = ShortRecipeSerializer(many=True)
     recipes_count = SerializerMethodField()
 
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + ('recipes', 'recipes_count',)
+
     def get_recipes_count(self, obj):
         return obj.recipes.count()
-
-    class Meta:
-        model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name',
-                  'is_subscribed', 'recipes', 'recipes_count')
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
