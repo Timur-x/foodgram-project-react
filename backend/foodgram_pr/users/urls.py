@@ -31,4 +31,4 @@ urlpatterns = [
         {'delete': 'subscribe'}),
          name='user-unsubscribe'),
     path('', include(router.urls)),
-    ]
+]
