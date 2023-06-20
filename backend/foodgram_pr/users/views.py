@@ -4,6 +4,7 @@ from django.dispatch import receiver
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from djoser.views import TokenCreateView, UserViewSet
+from recipes.models import ShoppingCart
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
