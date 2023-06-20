@@ -7,10 +7,12 @@ from ingredients.views import IngredientViewSet
 from recipes.views import RecipeViewSet
 from rest_framework.routers import DefaultRouter
 from tags.views import TagViewSet
-from users.views import TokenCreateWithCheckBlockStatusView
+from users.views import (TokenCreateWithCheckBlockStatusView,
+                         UserSubscribeViewSet)
 
 router_v1 = DefaultRouter()
 router_v1.register('tags', TagViewSet)
+router_v1.register('users', UserSubscribeViewSet, basename='users')
 router_v1.register('ingredients', IngredientViewSet)
 router_v1.register('recipes', RecipeViewSet)
 
@@ -23,7 +25,6 @@ authorization = [
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router_v1.urls)),
-    path('api/', include('users.urls', namespace='users')),
     path('api/auth/', include(authorization))
      ]
 
