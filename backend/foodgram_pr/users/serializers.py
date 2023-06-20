@@ -7,7 +7,7 @@ from .models import User
 
 
 class CustomUserSerializer(UserSerializer):
-    is_subscribed = SerializerMethodField('is_subscribed_user')
+    is_subscribed = SerializerMethodField('is_subscribed')
 
     class Meta:
         model = User
