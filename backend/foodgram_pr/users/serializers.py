@@ -31,7 +31,7 @@ class CustomUserSerializer(UserSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        if isinstance(instance, AnonymousUser):
+        if isinstance(self.context['request'].user, AnonymousUser):
             data.pop('email', None)
             data.pop('is_subscribed', None)
         return data
