@@ -27,9 +27,7 @@ class CustomUserSerializer(UserSerializer):
 
     def is_subscribed_user(self, obj):
         user = self.context['request'].user
-        if user.is_anonymous:
-            return False
-        return obj.subscribing.filter(subscribes=user).exists()
+        return bool(obj.subscriber.filter(user=user))
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -49,8 +47,18 @@ class SubscriptionSerializer(CustomUserSerializer):
     recipes = ShortRecipeSerializer(many=True)
     recipes_count = SerializerMethodField()
 
-    class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + ('recipes', 'recipes_count',)
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+            'recipes',
+            'recipes_count'
+        )
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
