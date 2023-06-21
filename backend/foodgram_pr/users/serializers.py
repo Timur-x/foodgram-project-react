@@ -35,6 +35,7 @@ class CustomUserSerializer(UserSerializer):
         data = super().to_representation(instance)
         if isinstance(instance, AnonymousUser):
             data.pop('email', None)
+            data.pop('is_subscribed', None)
         return data
 
     def create(self, validated_data):
