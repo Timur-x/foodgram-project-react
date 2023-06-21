@@ -3,12 +3,12 @@ from django.dispatch import receiver
 from django.shortcuts import get_object_or_404
 from djoser.views import TokenCreateView, UserViewSet
 from recipes.models import ShoppingCart
+from rest_framework import exceptions
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
-from rest_framework import exceptions
 from rest_framework.response import Response
 from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
                                    HTTP_400_BAD_REQUEST,
