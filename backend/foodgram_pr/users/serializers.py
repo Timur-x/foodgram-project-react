@@ -31,12 +31,12 @@ class CustomUserSerializer(UserSerializer):
             return bool(obj.subscribes.filter(user=user))
         return False
 
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        if isinstance(self.context['request'].user, AnonymousUser):
-            data.pop('email', None)
-            data.pop('is_subscribed', None)
-        return data
+    # def to_representation(self, instance):
+    #     data = super().to_representation(instance)
+    #     if isinstance(self.context['request'].user, AnonymousUser):
+    #         data.pop('email', None)
+    #         data.pop('is_subscribed', None)
+    #     return data
 
     def create(self, validated_data):
         validated_data['password'] = (
