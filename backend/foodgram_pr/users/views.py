@@ -3,13 +3,12 @@ from django.dispatch import receiver
 from django.shortcuts import get_object_or_404
 from djoser.views import TokenCreateView, UserViewSet
 from recipes.models import ShoppingCart
-from recipes.permissions import IsAuthorOrAdminOrReadOnly
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
+from rest_framework.response import Response, ValidationError
 from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
                                    HTTP_400_BAD_REQUEST,
                                    HTTP_405_METHOD_NOT_ALLOWED)
@@ -36,7 +35,7 @@ class TokenCreateWithCheckBlockStatusView(TokenCreateView):
 class UserSubscribeViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
-    permission_classes = (IsAuthorOrAdminOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = PageNumberPagination
 
     @action(
