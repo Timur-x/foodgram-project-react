@@ -3,7 +3,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from djoser.views import UserViewSet
+from djoser.views import TokenCreateView, UserViewSet
 from recipes.models import ShoppingCart
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
@@ -23,14 +23,14 @@ class PageNumberPagination(PageNumberPagination):
     max_page_size = 10
 
 
-# class TokenCreateWithCheckBlockStatusView(TokenCreateView):
-#     def _action(self, serializer):
-#         if serializer.user.is_blocked:
-#             return Response(
-#                 {'errors': 'аккаунт заблокирован!'},
-#                 status=HTTP_400_BAD_REQUEST,
-#             )
-#         return super()._action(serializer)
+class TokenCreateWithCheckBlockStatusView(TokenCreateView):
+    def _action(self, serializer):
+        if serializer.user.is_blocked:
+            return Response(
+                {'errors': 'аккаунт заблокирован!'},
+                status=HTTP_400_BAD_REQUEST,
+            )
+        return super()._action(serializer)
 
 
 class UserSubscribeViewSet(UserViewSet):
