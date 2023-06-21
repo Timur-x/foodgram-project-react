@@ -27,7 +27,9 @@ class CustomUserSerializer(UserSerializer):
 
     def is_subscribed_user(self, obj):
         user = self.context['request'].user
-        return bool(obj.subscribes.filter(user=user))
+        if user.is_authenticated:
+            return bool(obj.subscribes.filter(user=user))
+        return False
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
