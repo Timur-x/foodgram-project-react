@@ -1,5 +1,5 @@
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.models import AnonymousUser
+# from django.contrib.auth.models import AnonymousUser
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.serializers.shortrecipes import ShortRecipeSerializer
 from rest_framework.serializers import EmailField, SerializerMethodField
