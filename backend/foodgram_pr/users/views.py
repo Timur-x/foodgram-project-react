@@ -1,10 +1,10 @@
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+# from django.db.models.signals import post_save
+# from django.dispatch import receiver
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
-from recipes.models import ShoppingCart
+# from recipes.models import ShoppingCart
 from rest_framework import exceptions
-from rest_framework.authtoken.models import Token
+# from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import (IsAuthenticated,
@@ -87,19 +87,19 @@ class UserSubscribeViewSet(UserViewSet):
         return Response(status=HTTP_405_METHOD_NOT_ALLOWED)
 
 
-@receiver(post_save, sender=User)
-def create_shopping_cart(sender, instance, created, **kwargs):
-    if created:
-        ShoppingCart.objects.create(user=instance)
+# @receiver(post_save, sender=User)
+# def create_shopping_cart(sender, instance, created, **kwargs):
+#     if created:
+#         ShoppingCart.objects.create(user=instance)
 
 
-@receiver(post_save, sender=User)
-def destroy_token(sender, instance, created, **kwargs):
-    if created or not instance.is_blocked:
-        return
-    token = Token.objects.filter(user=instance)
-    if token.exists():
-        token.first().delete()
+# @receiver(post_save, sender=User)
+# def destroy_token(sender, instance, created, **kwargs):
+#     if created or not instance.is_blocked:
+#         return
+#     token = Token.objects.filter(user=instance)
+#     if token.exists():
+#         token.first().delete()
 
 # class UserMeViewSet(viewsets.ModelViewSet):
 #     serializer_class = CustomUserSerializer
