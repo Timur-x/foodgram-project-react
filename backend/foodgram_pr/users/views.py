@@ -6,7 +6,7 @@ from djoser.views import UserViewSet
 from rest_framework import exceptions
 # from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
-from rest_framework.pagination import PageNumberPagination
+# from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
@@ -14,12 +14,12 @@ from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
                                    HTTP_405_METHOD_NOT_ALLOWED)
 
 from .models import Subscription, User
+from .pagination import CustomPageNumberPagination
 from .serializers import CustomUserSerializer, SubscriptionSerializer
 
-
-class LimitPageNumberPagination(PageNumberPagination):
-    page_size_query_param = 'page_size'
-    max_page_size = 10
+# class LimitPageNumberPagination(PageNumberPagination):
+#     page_size_query_param = 'page_size'
+#     max_page_size = 10
 
 
 # class TokenCreateWithCheckBlockStatusView(TokenCreateView):
@@ -36,7 +36,7 @@ class UserSubscribeViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    pagination_class = LimitPageNumberPagination
+    pagination_class = CustomPageNumberPagination
 
     @action(
         detail=False,
