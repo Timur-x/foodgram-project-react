@@ -17,11 +17,6 @@ from .models import Subscription, User
 from .pagination import CustomPageNumberPagination
 from .serializers import CustomUserSerializer, SubscriptionSerializer
 
-# class LimitPageNumberPagination(PageNumberPagination):
-#     page_size_query_param = 'page_size'
-#     max_page_size = 10
-
-
 # class TokenCreateWithCheckBlockStatusView(TokenCreateView):
 #     def _action(self, serializer):
 #         if serializer.user.is_blocked:
