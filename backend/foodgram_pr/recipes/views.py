@@ -86,9 +86,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data,
                                 status=HTTP_201_CREATED
                                 )
-            else:
-                return Response({'message': 'Рецепт уже в избранном.'},
-                                status=HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Рецепт уже в избранном.'},
+                            status=HTTP_400_BAD_REQUEST
+                            )
 
         if request.method == 'DELETE':
             try:
@@ -117,8 +117,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     context={'request': request}
                      )
                 return Response(serializer.data, status=HTTP_201_CREATED)
-            else:
-                return Response(
+            return Response(
                     {'message': 'Рецепт уже в корзине покупок.'},
                     status=HTTP_400_BAD_REQUEST
                      )
