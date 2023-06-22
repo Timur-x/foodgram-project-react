@@ -17,7 +17,7 @@ from .models import Subscription, User
 from .serializers import CustomUserSerializer, SubscriptionSerializer
 
 
-class PageNumberPagination(PageNumberPagination):
+class LimitPageNumberPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 10
 
@@ -36,7 +36,7 @@ class UserSubscribeViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    pagination_class = PageNumberPagination
+    pagination_class = LimitPageNumberPagination
 
     @action(
         detail=False,
@@ -95,25 +95,3 @@ class UserSubscribeViewSet(UserViewSet):
             return Response(status=HTTP_204_NO_CONTENT)
 
         return Response(status=HTTP_405_METHOD_NOT_ALLOWED)
-
-
-# @receiver(post_save, sender=User)
-# def create_shopping_cart(sender, instance, created, **kwargs):
-#     if created:
-#         ShoppingCart.objects.create(user=instance)
-
-
-# @receiver(post_save, sender=User)
-# def destroy_token(sender, instance, created, **kwargs):
-#     if created or not instance.is_blocked:
-#         return
-#     token = Token.objects.filter(user=instance)
-#     if token.exists():
-#         token.first().delete()
-
-# class UserMeViewSet(viewsets.ModelViewSet):
-#     serializer_class = CustomUserSerializer
-#     permission_classes = [IsAuthenticated]
-
-#     def get_queryset(self):
-#         return self.request.user
