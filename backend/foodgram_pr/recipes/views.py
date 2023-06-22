@@ -2,13 +2,13 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import exceptions, viewsets
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (SAFE_METHODS, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
-                                   HTTP_204_NO_CONTENT,
+                                   HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST,
                                    HTTP_405_METHOD_NOT_ALLOWED)
 from users.pagination import CustomPageNumberPagination
 
@@ -71,56 +71,70 @@ class RecipeViewSet(viewsets.ModelViewSet):
         detail=True,
     )
     def favorite(self, request, pk=None):
-        user = self.request.user
+        user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
-        if self.request.method == 'POST':
-            favorite = Favorite.objects.create(user=user, recipe=recipe)
-            serializer = ShortRecipeSerializer(
-                favorite.recipe,
-                context={'request': request}
-            )
 
-            return Response(serializer.data, status=HTTP_201_CREATED)
+        if request.method == 'POST':
+            favorite, created = Favorite.objects.get_or_create(
+                user=user,
+                recipe=recipe
+                 )
+            if created:
+                serializer = ShortRecipeSerializer(favorite.recipe,
+                                                   context={'request': request}
+                                                   )
+                return Response(serializer.data,
+                                status=HTTP_201_CREATED
+                                )
+            else:
+                return Response({'message': 'Рецепт уже в избранном.'},
+                                status=HTTP_400_BAD_REQUEST)
 
-        if self.request.method == 'DELETE':
-            if not user.in_favorite.filter(recipe=recipe).exists():
-                raise exceptions.ValidationError(
-                    'Рецепта нет в избранном, либо он уже удален.'
-                     )
-            favorite = get_object_or_404(Favorite, user=user, recipe=recipe)
-            favorite.delete()
-            return Response(status=HTTP_204_NO_CONTENT)
+        if request.method == 'DELETE':
+            try:
+                favorite = Favorite.objects.get(user=user, recipe=recipe)
+                favorite.delete()
+                return Response(status=HTTP_204_NO_CONTENT)
+            except Favorite.DoesNotExist:
+                return Response({'message': 'Рецепт не найден в избранном.'},
+                                status=HTTP_400_BAD_REQUEST)
+
         return Response(status=HTTP_405_METHOD_NOT_ALLOWED)
 
     @action(detail=True, methods=('post', 'delete'))
     def shopping_cart(self, request, pk=None):
-        user = self.request.user
+        user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
 
-        if self.request.method == 'POST':
-            ShoppingCart.objects.create(user=user, recipe=recipe)
-            serializer = ShortRecipeSerializer(
-                recipe,
-                context={'request': request}
-            )
-
-            return Response(serializer.data, status=HTTP_201_CREATED)
-
-        if self.request.method == 'DELETE':
-            if not user.in_shopping_list.filter(recipe=recipe).exists():
-                raise exceptions.ValidationError(
-                    'Рецепта нет в списке покупок, либо он уже удален.'
-                )
-
-            shopping_cart = get_object_or_404(
-                ShoppingCart,
+        if request.method == 'POST':
+            shopping_cart, created = ShoppingCart.objects.get_or_create(
                 user=user,
                 recipe=recipe
-            )
-            shopping_cart.delete()
-
-            return Response(status=HTTP_204_NO_CONTENT)
-
+                 )
+            if created:
+                serializer = ShortRecipeSerializer(
+                    recipe,
+                    context={'request': request}
+                     )
+                return Response(serializer.data, status=HTTP_201_CREATED)
+            else:
+                return Response(
+                    {'message': 'Рецепт уже в корзине покупок.'},
+                    status=HTTP_400_BAD_REQUEST
+                     )
+        if request.method == 'DELETE':
+            try:
+                shopping_cart = ShoppingCart.objects.get(
+                    user=user,
+                    recipe=recipe
+                     )
+                shopping_cart.delete()
+                return Response(status=HTTP_204_NO_CONTENT)
+            except ShoppingCart.DoesNotExist:
+                return Response(
+                    {'message': 'Рецепт не найден в корзине покупок.'},
+                    status=HTTP_400_BAD_REQUEST
+                     )
         return Response(status=HTTP_405_METHOD_NOT_ALLOWED)
 
     @action(

@@ -1,5 +1,4 @@
 from django.contrib.auth.hashers import make_password
-# from django.contrib.auth.models import AnonymousUser
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.serializers.shortrecipes import ShortRecipeSerializer
 from rest_framework.serializers import EmailField, SerializerMethodField
@@ -30,13 +29,6 @@ class CustomUserSerializer(UserSerializer):
         if user.is_authenticated:
             return bool(obj.subscribes.filter(user=user))
         return False
-
-    # def to_representation(self, instance):
-    #     data = super().to_representation(instance)
-    #     if isinstance(self.context['request'].user, AnonymousUser):
-    #         data.pop('email', None)
-    #         data.pop('is_subscribed', None)
-    #     return data
 
     def create(self, validated_data):
         validated_data['password'] = (
