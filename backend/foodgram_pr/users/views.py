@@ -64,6 +64,16 @@ class UserSubscribeViewSet(UserViewSet):
         author = get_object_or_404(User, pk=id)
 
         if self.request.method == 'POST':
+            if user == author:
+                raise exceptions.ValidationError(
+                    'Подписатся на самого себя нельзя.'
+                )
+            if Subscription.objects.filter(
+                user=user,
+                author=author
+            ).exists():
+                raise exceptions.ValidationError('Подписка уже оформлена.')
+
             Subscription.objects.create(user=user, author=author)
             serializer = self.get_serializer(author)
 
@@ -72,7 +82,7 @@ class UserSubscribeViewSet(UserViewSet):
         if self.request.method == 'DELETE':
             if not user.subscribers.filter(author=author).exists():
                 raise exceptions.ValidationError(
-                    'Подписка не была оформлена, либо уже удалена.'
+                    'Подписка уже удалена.'
                 )
 
             subscription = get_object_or_404(
