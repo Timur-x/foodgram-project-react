@@ -59,9 +59,9 @@ class UserSubscribeViewSet(UserViewSet):
         methods=('post', 'delete'),
         serializer_class=SubscriptionSerializer
     )
-    def subscribe(self, request, user_id=None):
+    def subscribe(self, request, id=None):
         user = self.request.user
-        author = get_object_or_404(User, pk=user_id)
+        author = get_object_or_404(User, pk=id)
 
         if self.request.method == 'POST':
             Subscription.objects.create(user=user, author=author)
