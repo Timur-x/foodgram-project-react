@@ -43,7 +43,7 @@ class UserSubscribeViewSet(UserViewSet):
         user = self.request.user
 
         def queryset():
-            return User.objects.filter(subscriber__user=user)
+            return User.objects.filter(subscribers__user=user)
         paginated_queryset = self.paginate_queryset(queryset)
         serializer = self.get_serializer(paginated_queryset, many=True)
 
