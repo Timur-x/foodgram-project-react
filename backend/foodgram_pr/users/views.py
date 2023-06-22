@@ -41,7 +41,7 @@ class UserSubscribeViewSet(UserViewSet):
     )
     def subscriptions(self, request):
         user = self.request.user
-        user_subscriptions = user.subscribes.all()
+        user_subscriptions = user.subscribers.all()
         authors = [item.author.id for item in user_subscriptions]
         queryset = User.objects.filter(pk__in=authors)
         paginated_queryset = self.paginate_queryset(queryset)
@@ -75,7 +75,7 @@ class UserSubscribeViewSet(UserViewSet):
             return Response(serializer.data, status=HTTP_201_CREATED)
 
         if self.request.method == 'DELETE':
-            if not user.subscribes.filter(author=author).exists():
+            if not user.subscribers.filter(author=author).exists():
                 raise exceptions.ValidationError(
                     'Подписка уже удалена.'
                 )
