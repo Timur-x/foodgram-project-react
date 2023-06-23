@@ -1,9 +1,9 @@
 from django.contrib.auth.hashers import make_password
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.serializers.shortrecipes import ShortRecipeSerializer
-from rest_framework.serializers import EmailField, SerializerMethodField
-from rest_framework.validators import UniqueValidator
+from rest_framework.serializers import SerializerMethodField
 
+# from rest_framework.validators import UniqueValidator
 from .models import User
 
 
