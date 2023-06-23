@@ -1,50 +1,48 @@
-# from django.db.models.signals import post_save
-# from django.dispatch import receiver
 from django.shortcuts import get_object_or_404
-from djoser.views import UserViewSet
-# from recipes.models import ShoppingCart
+from djoser.views import TokenCreateView, UserViewSet
 from rest_framework import exceptions
-# from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
-# from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
-from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
-                                   HTTP_204_NO_CONTENT,
+from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
+                                   HTTP_400_BAD_REQUEST,
                                    HTTP_405_METHOD_NOT_ALLOWED)
 
 from .models import Subscription, User
 from .pagination import CustomPageNumberPagination
 from .serializers import SubscriptionSerializer
 
-# class TokenCreateWithCheckBlockStatusView(TokenCreateView):
-#     def _action(self, serializer):
-#         if serializer.user.is_blocked:
-#             return Response(
-#                 {'errors': 'аккаунт заблокирован!'},
-#                 status=HTTP_400_BAD_REQUEST,
-#             )
-#         return super()._action(serializer)
+
+class TokenCreateWithCheckBlockStatusView(TokenCreateView):
+    def _action(self, serializer):
+        if serializer.user.is_blocked:
+            return Response(
+                {'errors': 'аккаунт заблокирован!'},
+                status=HTTP_400_BAD_REQUEST,
+            )
+        return super()._action(serializer)
 
 
 class UserSubscribeViewSet(UserViewSet):
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = CustomPageNumberPagination
-    lookup_url_kwarg = 'user_id'
 
-    def get_subscribtion_serializer(self, *args, **kwargs):
-        kwargs.setdefault('context', self.get_serializer_context())
-        return SubscriptionSerializer(*args, **kwargs)
-
-    @action(detail=False, permission_classes=(IsAuthenticated,))
+    @action(
+        detail=False,
+        methods=('get',),
+        serializer_class=SubscriptionSerializer,
+        permission_classes=(IsAuthenticated, )
+    )
     def subscriptions(self, request):
-        self.get_serializer
-        queryset = User.objects.filter(subscribers__user=request.user)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_subscribtion_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_subscribtion_serializer(queryset, many=True)
-        return Response(serializer.data, status=HTTP_200_OK)
+        user = self.request.user
+
+        def queryset():
+            return User.objects.filter(subscriber__user=user)
+        paginated_queryset = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(paginated_queryset, many=True)
+
+        return self.get_paginated_response(serializer.data)
 
     @action(
         detail=True,
@@ -56,16 +54,6 @@ class UserSubscribeViewSet(UserViewSet):
         author = get_object_or_404(User, pk=id)
 
         if self.request.method == 'POST':
-            if user == author:
-                raise exceptions.ValidationError(
-                    'Подписатся на самого себя нельзя.'
-                )
-            if Subscription.objects.filter(
-                user=user,
-                author=author
-            ).exists():
-                raise exceptions.ValidationError('Подписка уже оформлена.')
-
             Subscription.objects.create(user=user, author=author)
             serializer = self.get_serializer(author)
 
@@ -74,7 +62,7 @@ class UserSubscribeViewSet(UserViewSet):
         if self.request.method == 'DELETE':
             if not user.subscribers.filter(author=author).exists():
                 raise exceptions.ValidationError(
-                    'Подписка уже удалена.'
+                    'Подписка не была оформлена, либо уже удалена.'
                 )
 
             subscription = get_object_or_404(
