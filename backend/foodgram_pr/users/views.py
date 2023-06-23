@@ -16,7 +16,7 @@ from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
 
 from .models import Subscription, User
 from .pagination import CustomPageNumberPagination
-from .serializers import CustomUserSerializer, SubscriptionSerializer
+from .serializers import SubscriptionSerializer
 
 # class TokenCreateWithCheckBlockStatusView(TokenCreateView):
 #     def _action(self, serializer):
@@ -29,10 +29,8 @@ from .serializers import CustomUserSerializer, SubscriptionSerializer
 
 
 class UserSubscribeViewSet(UserViewSet):
-    queryset = User.objects.all()
-    serializer_class = CustomUserSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = CustomPageNumberPagination
+    lookup_url_kwarg = 'user_id'
 
     def get_subscribtion_serializer(self, *args, **kwargs):
         kwargs.setdefault('context', self.get_serializer_context())
