@@ -28,6 +28,9 @@ class UserSubscribeViewSet(UserViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = CustomPageNumberPagination
 
+    def get_paginated_response(self, data):
+        return self.paginator.get_paginated_response(data)
+
     @action(
         detail=False,
         methods=('get',),
