@@ -8,7 +8,7 @@ from rest_framework import exceptions
 # from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 # from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
                                    HTTP_405_METHOD_NOT_ALLOWED)
@@ -30,19 +30,19 @@ from .serializers import CustomUserSerializer, SubscriptionSerializer
 class UserSubscribeViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
-    permission_classes = (IsAuthorOrAdminOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = CustomPageNumberPagination
 
     @action(
         detail=False,
         methods=('get',),
         serializer_class=SubscriptionSerializer,
-        permission_classes=(IsAuthenticated, )
+        permission_classes=(IsAuthorOrAdminOrReadOnly,)
     )
     def subscriptions(self, request):
         user = self.request.user
         user_subscriptions = user.subscribers.all()
-        authors = [item.id for item in user_subscriptions]
+        authors = [item.author.id for item in user_subscriptions]
         queryset = User.objects.filter(pk__in=authors)
         paginated_queryset = self.paginate_queryset(queryset)
         serializer = self.get_serializer(paginated_queryset, many=True)
