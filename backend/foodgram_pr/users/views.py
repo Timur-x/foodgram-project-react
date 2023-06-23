@@ -2,6 +2,7 @@
 # from django.dispatch import receiver
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
+from recipes.permissions import IsAuthorOrAdminOrReadOnly
 # from recipes.models import ShoppingCart
 from rest_framework import exceptions
 # from rest_framework.authtoken.models import Token
@@ -12,7 +13,6 @@ from rest_framework.response import Response
 from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
                                    HTTP_405_METHOD_NOT_ALLOWED)
 
-from recipes.permissions import IsAuthorOrAdminOrReadOnly
 from .models import Subscription, User
 from .pagination import CustomPageNumberPagination
 from .serializers import CustomUserSerializer, SubscriptionSerializer
