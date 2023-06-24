@@ -49,8 +49,8 @@ class UserSubscribeViewSet(UserViewSet):
 
         # Manually build the paginated response
         return Response({
-            'count': paginator.page.paginator.count,
-            'results': serializer.data,
+            'count': paginator.count,
+            'esults': serializer.data,
             'next': paginator.get_next_link(),
             'previous': paginator.get_previous_link()
         })
