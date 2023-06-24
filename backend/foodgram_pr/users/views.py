@@ -6,7 +6,6 @@ from djoser.views import UserViewSet
 from rest_framework import exceptions
 # from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
@@ -14,7 +13,7 @@ from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
                                    HTTP_405_METHOD_NOT_ALLOWED)
 
 from .models import Subscription, User
-# from .pagination import CustomPageNumberPagination
+from .pagination import CustomPageNumberPagination
 from .serializers import CustomUserSerializer, SubscriptionSerializer
 
 # class TokenCreateWithCheckBlockStatusView(TokenCreateView):
@@ -31,7 +30,7 @@ class UserSubscribeViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    pagination_class = PageNumberPagination
+    pagination_class = CustomPageNumberPagination
 
     @action(
         detail=False,
@@ -44,12 +43,17 @@ class UserSubscribeViewSet(UserViewSet):
         user_subscriptions = user.subscribers.all()
         authors = [item.author.id for item in user_subscriptions]
         queryset = User.objects.filter(pk__in=authors)
-        paginated_queryset = self.paginate_queryset(queryset)
-        if paginated_queryset is not None:
-            serializer = self.get_serializer(paginated_queryset, many=True)
-            return self.get_paginated_response(serializer.data)
+        paginator = self.pagination_class()
+        paginated_queryset = paginator.paginate_queryset(queryset, request)
+        serializer = self.get_serializer(paginated_queryset, many=True)
 
-        return Response([])
+        # Manually build the paginated response
+        return Response({
+            'count': paginator.page.paginator.count,
+            'results': serializer.data,
+            'next': paginator.get_next_link(),
+            'previous': paginator.get_previous_link()
+        })
 
     @action(
         detail=True,
