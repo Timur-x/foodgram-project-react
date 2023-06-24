@@ -36,7 +36,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return RecipeCreateUpdateSerializer
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        user = self.request.user
+        serializer.save(author=user)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -143,7 +144,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def download_shopping_cart(self, request):
-        shopping_cart = ShoppingCart.objects.filter(user=self.request.user)
+        user = self.request.user
+        shopping_cart = ShoppingCart.objects.filter(user=user)
         recipes = [item.recipe.id for item in shopping_cart]
         buy_list = RecipeIngredients.objects.filter(
             recipe__in=recipes
