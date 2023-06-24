@@ -32,7 +32,7 @@ class UserSubscribeViewSet(UserViewSet):
         return self.paginator.get_paginated_response(data)
 
     @action(
-        detail=False,
+        detail=True,
         methods=('get',),
         serializer_class=SubscriptionSerializer,
         permission_classes=(IsAuthenticated, )
