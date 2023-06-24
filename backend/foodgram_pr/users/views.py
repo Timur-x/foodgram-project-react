@@ -58,7 +58,7 @@ class UserSubscribeViewSet(UserViewSet):
             'esults': serializer.data,
             'next': paginator.get_next_link(),
             'previous': paginator.get_previous_link()
-            }
+        }
         print(response_data)
         return Response(response_data)
 
