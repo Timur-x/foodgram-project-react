@@ -40,9 +40,12 @@ class UserSubscribeViewSet(UserViewSet):
     )
     def subscriptions(self, request):
         user = self.request.user
+        print(user)
         user_subscriptions = user.subscribers.all()
+        print(user_subscriptions)
         authors = [item.author.id for item in user_subscriptions]
         queryset = User.objects.filter(pk__in=authors)
+        print(queryset)
         paginator = self.pagination_class()
         paginated_queryset = paginator.paginate_queryset(queryset, request)
         serializer = self.get_serializer(paginated_queryset, many=True)
@@ -96,3 +99,8 @@ class UserSubscribeViewSet(UserViewSet):
             return Response(status=HTTP_204_NO_CONTENT)
 
         return Response(status=HTTP_405_METHOD_NOT_ALLOWED)
+
+
+user = User.objects.get(username='your_username')
+subscriptions = Subscription.objects.filter(user=user)
+print(subscriptions)
