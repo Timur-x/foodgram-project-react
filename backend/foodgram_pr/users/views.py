@@ -11,7 +11,8 @@ from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
 
 from .models import Subscription, User
 from .pagination import CustomPageNumberPagination
-from .serializers import CustomUserSerializer
+from .serializers import (APIResponseSerializer, CustomUserSerializer,
+                          SubscriptionSerializer)
 
 
 class TokenCreateWithCheckBlockStatusView(TokenCreateView):
@@ -28,13 +29,10 @@ class UserSubscribeViewSet(UserViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = CustomPageNumberPagination
 
-    def get_paginated_response(self, data):
-        return self.paginator.get_paginated_response(data)
-
     @action(
         detail=False,
         methods=('get',),
-        serializer_class=CustomUserSerializer,
+        serializer_class=SubscriptionSerializer,
         permission_classes=(IsAuthenticated, )
      )
     def subscriptions(self, request):
@@ -43,15 +41,20 @@ class UserSubscribeViewSet(UserViewSet):
         def queryset():
             return User.objects.filter(subscribers__user=user)
         paginated_queryset = self.paginate_queryset(queryset())
-        serializer = self.get_serializer(paginated_queryset, many=True)
-
-        return self.get_paginated_response(serializer.data)
+        serializer = SubscriptionSerializer(paginated_queryset, many=True)
+        response_data = APIResponseSerializer({
+            'count': paginated_queryset.count(),
+            'next': self.paginator.get_next_link(),
+            'previous': self.paginator.get_previous_link(),
+            'results': serializer.data
+         })
+        return Response(response_data.data)
 
     @action(
         detail=True,
         methods=('post', 'delete'),
         serializer_class=CustomUserSerializer
-    )
+     )
     def subscribe(self, request, id=None):
         user = self.request.user
         author = get_object_or_404(User, pk=id)

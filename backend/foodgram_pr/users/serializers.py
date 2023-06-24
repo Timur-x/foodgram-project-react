@@ -4,15 +4,15 @@ from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.models import Recipe
 from recipes.serializers.recipes import RecipeSerializer
 # from rest_framework.exceptions import ValidationError
-from rest_framework.serializers import SerializerMethodField
+from rest_framework import serializers
 
 # from rest_framework.validators import UniqueValidator
 from .models import Subscription, User
 
 
 class CustomUserSerializer(UserSerializer):
-    is_subscribed = SerializerMethodField('is_subscribed_user')
-    recipes = SerializerMethodField()
+    is_subscribed = serializers.SerializerMethodField('is_subscribed_user')
+    recipes = serializers.SerializerMethodField()
     # email = EmailField(label='Адрес эл. почты(email)',
     #                    max_length=254,
     #                    validators=[UniqueValidator(queryset=User.objects.all())
@@ -52,8 +52,8 @@ class CustomUserSerializer(UserSerializer):
 
 
 class SubscriptionSerializer(CustomUserSerializer):
-    recipes = SerializerMethodField(method_name='get_recipes')
-    recipes_count = SerializerMethodField(
+    recipes = serializers.SerializerMethodField(method_name='get_recipes')
+    recipes_count = serializers.SerializerMethodField(
         method_name='get_recipes_count'
     )
 
@@ -94,3 +94,16 @@ class CustomUserCreateSerializer(UserCreateSerializer):
         model = User
         fields = ('email', 'id', 'username', 'first_name',
                   'last_name', 'password')
+
+
+class UserWithRecipesSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    recipes = RecipeSerializer(many=True)
+
+
+class APIResponseSerializer(serializers.Serializer):
+    count = serializers.IntegerField()
+    next = serializers.CharField(allow_null=True)
+    previous = serializers.CharField(allow_null=True)
+    results = UserWithRecipesSerializer(many=True)
