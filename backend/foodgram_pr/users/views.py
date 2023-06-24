@@ -53,12 +53,14 @@ class UserSubscribeViewSet(UserViewSet):
         paginated_queryset = paginator.paginate_queryset(queryset, request)
         serializer = self.get_serializer(paginated_queryset, many=True)
 
-        return Response({
+        response_data = {
             'count': paginator.count,
             'esults': serializer.data,
             'next': paginator.get_next_link(),
             'previous': paginator.get_previous_link()
-        })
+            }
+        print(response_data)
+        return Response(response_data)
 
     @action(
         detail=True,
