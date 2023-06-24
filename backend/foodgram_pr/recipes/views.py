@@ -10,7 +10,8 @@ from rest_framework.response import Response
 from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
                                    HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST,
                                    HTTP_405_METHOD_NOT_ALLOWED)
-from users.pagination import CustomPageNumberPagination
+# from users.pagination import CustomPageNumberPagination
+from rest_framework.pagination import PageNumberPagination
 
 from .filters import RecipeFilter
 from .models import (Favorite, Ingredient, Recipe, RecipeIngredients,
@@ -22,7 +23,7 @@ FILE_NAME = 'Список покупок.txt'
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    pagination_class = CustomPageNumberPagination
+    pagination_class = PageNumberPagination
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
