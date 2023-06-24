@@ -4,14 +4,14 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.decorators import action
+# from users.pagination import CustomPageNumberPagination
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import (SAFE_METHODS, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
                                    HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST,
                                    HTTP_405_METHOD_NOT_ALLOWED)
-# from users.pagination import CustomPageNumberPagination
-from rest_framework.pagination import PageNumberPagination
 
 from .filters import RecipeFilter
 from .models import (Favorite, Ingredient, Recipe, RecipeIngredients,
