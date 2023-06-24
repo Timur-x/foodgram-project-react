@@ -10,8 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
-from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
-                                   HTTP_204_NO_CONTENT,
+from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
                                    HTTP_405_METHOD_NOT_ALLOWED)
 
 from .models import Subscription, User
@@ -34,20 +33,21 @@ class UserSubscribeViewSet(UserViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = CustomPageNumberPagination
 
-    def get_subscribtion_serializer(self, *args, **kwargs):
-        kwargs.setdefault('context', self.get_serializer_context())
-        return SubscriptionSerializer(*args, **kwargs)
-
-    @action(detail=False, permission_classes=(IsAuthenticated,))
+    @action(
+        detail=False,
+        methods=('get',),
+        serializer_class=SubscriptionSerializer,
+        permission_classes=(IsAuthenticated, )
+    )
     def subscriptions(self, request):
-        self.get_serializer
-        queryset = User.objects.filter(subscribers__user=request.user)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_subscribtion_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_subscribtion_serializer(queryset, many=True)
-        return Response(serializer.data, status=HTTP_200_OK)
+        user = self.request.user
+        user_subscriptions = user.subscribers.all()
+        authors = [item.author.id for item in user_subscriptions]
+        queryset = User.objects.filter(pk__in=authors)
+        paginated_queryset = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(paginated_queryset, many=True)
+
+        return self.get_paginated_response(serializer.data)
 
     @action(
         detail=True,
