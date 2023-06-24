@@ -1,9 +1,9 @@
-# from django.contrib.auth.hashers import make_password
-# from django.shortcuts import get_object_or_404
+from django.contrib.auth.hashers import make_password
+from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.models import Recipe
-from recipes.serializers.recipes import RecipeSerializer
-# from rest_framework.exceptions import ValidationError
+# from recipes.serializers.recipes import RecipeSerializer
+from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import SerializerMethodField
 
 # from rest_framework.validators import UniqueValidator
@@ -11,30 +11,38 @@ from .models import Subscription, User
 
 
 class CustomUserSerializer(UserSerializer):
-    is_subscribed = SerializerMethodField('is_subscribed_user')
-    recipes = SerializerMethodField()
+    is_subscribed = SerializerMethodField(
+        method_name='get_is_subscribed'
+    )
 
-    def is_subscribed_user(self, obj):
+    def get_is_subscribed(self, obj):
         user = self.context['request'].user
-        author = obj
+        author = get_object_or_404(User, pk=id)
         if user == author:
-            return False
+            raise ValidationError(
+                    'Подписка на самого себя запрещена.'
+                )
         if Subscription.objects.filter(
                 user=user,
                 author=author
-                 ).exists():
-            return True
-        return False
+                ).exists():
+            raise ValidationError('Подписка уже оформлена.')
 
-    def get_recipes(self, obj):
-        recipes = Recipe.objects.filter(author=obj)
-        serializer = RecipeSerializer(recipes, many=True)
-        return serializer.data
+        if user.is_anonymous:
+            return False
+
+        return Subscription.objects.filter(user=user, author=obj).exists()
+
+    def create(self, validated_data):
+        validated_data['password'] = (
+            make_password(validated_data.pop('password'))
+        )
+        return super().create(validated_data)
 
     class Meta:
         model = User
         fields = ('email', 'id', 'username', 'first_name', 'last_name',
-                  'is_subscribed', 'recipes')
+                  'is_subscribed')
 
 
 class SubscriptionSerializer(CustomUserSerializer):
