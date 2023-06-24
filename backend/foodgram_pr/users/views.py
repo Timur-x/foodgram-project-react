@@ -10,7 +10,7 @@ from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
                                    HTTP_405_METHOD_NOT_ALLOWED)
 
 from .models import Subscription, User
-from .pagination import CustomPageNumberPagination
+# from .pagination import CustomPageNumberPagination
 from .serializers import SubscriptionSerializer
 
 
@@ -26,7 +26,7 @@ class TokenCreateWithCheckBlockStatusView(TokenCreateView):
 
 class UserSubscribeViewSet(UserViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    pagination_class = CustomPageNumberPagination
+    # pagination_class = CustomPageNumberPagination
 
     def get_paginated_response(self, data):
         return self.paginator.get_paginated_response(data)
