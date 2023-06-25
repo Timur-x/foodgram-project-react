@@ -1,4 +1,4 @@
-from django.db.models import Model, CharField, UniqueConstraint
+from django.db.models import CharField, Model, UniqueConstraint
 
 
 class Ingredient(Model):
