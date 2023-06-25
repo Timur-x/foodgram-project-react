@@ -24,9 +24,6 @@ from .serializers import CustomUserSerializer, SubscriptionSerializer
 #                 status=HTTP_400_BAD_REQUEST,
 #             )
 #         return super()._action(serializer)
-user = User.objects.get(username='admin_username')
-subscriptions = Subscription.objects.filter(user=user)
-print(subscriptions)
 
 
 class UserSubscribeViewSet(UserViewSet):
@@ -43,24 +40,12 @@ class UserSubscribeViewSet(UserViewSet):
     )
     def subscriptions(self, request):
         user = self.request.user
-        print(user)
         user_subscriptions = user.subscribers.all()
-        print(user_subscriptions)
         authors = [item.author.id for item in user_subscriptions]
         queryset = User.objects.filter(pk__in=authors)
-        print(queryset)
-        paginator = self.pagination_class()
-        paginated_queryset = paginator.paginate_queryset(queryset, request)
+        paginated_queryset = self.paginate_queryset(queryset)
         serializer = self.get_serializer(paginated_queryset, many=True)
-
-        response_data = {
-            'count': paginator.count,
-            'esults': serializer.data,
-            'next': paginator.get_next_link(),
-            'previous': paginator.get_previous_link()
-        }
-        print(response_data)
-        return Response(response_data)
+        return self.get_paginated_response(serializer.data)
 
     @action(
         detail=True,
