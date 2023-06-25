@@ -4,7 +4,8 @@ from djoser.serializers import UserCreateSerializer, UserSerializer
 # from recipes.models import Recipe
 from recipes.serializers.shortrecipes import ShortRecipeSerializer
 from rest_framework.exceptions import ValidationError
-from rest_framework.serializers import SerializerMethodField
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework.validators import UniqueTogetherValidator
 
 # from rest_framework.validators import UniqueValidator
 from .models import Subscription, User
@@ -62,3 +63,25 @@ class CustomUserCreateSerializer(UserCreateSerializer):
         model = User
         fields = ('email', 'id', 'username', 'first_name',
                   'last_name', 'password')
+
+
+class SubscriptionCreateSerializer(ModelSerializer):
+    """Сериализатор для создания подписки на автора."""
+
+    class Meta:
+        model = Subscription
+        fields = '__all__'
+
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Subscription.objects.all(),
+                fields=('user', 'author'),
+                message='Вы уже подписаны на этого пользователя.'
+            )
+        ]
+
+    def validate(self, data):
+        if data['user'] == data['author']:
+            raise ValidationError(
+                'Вы не можете подписаться на самого себя.')
+        return data
