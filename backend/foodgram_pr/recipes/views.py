@@ -14,8 +14,7 @@ from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
                                    HTTP_405_METHOD_NOT_ALLOWED)
 
 from .filters import RecipeFilter
-from .models import (Favorite, Ingredient, Recipe, RecipeIngredients,
-                     ShoppingCart)
+from .models import Ingredient, Recipe, RecipeIngredients, ShoppingCart
 from .serializers.recipes import RecipeCreateUpdateSerializer, RecipeSerializer
 from .serializers.shortrecipes import ShortRecipeSerializer
 
@@ -83,7 +82,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         #          )
         #     if created:
         #         serializer = ShortRecipeSerializer(favorite.recipe,
-        #                                            context={'request': request}
+        #                                          context={'request': request}
         #                                            )
         #         return Response(serializer.data,
         #                         status=HTTP_201_CREATED
