@@ -23,7 +23,7 @@ INSTALLED_APPS = [
     'djoser',
     'sorl.thumbnail',
     'django_filters',
-    'users.apps.UsersConfig',
+    'users',
     'recipes.apps.RecipesConfig',
     'tags.apps.TagsConfig',
     'ingredients.apps.IngredientsConfig',
