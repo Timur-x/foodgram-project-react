@@ -79,7 +79,7 @@ class RecipeIngredients(models.Model):
     )
 
     class Meta:
-        ordering = ('ingredient',)
+        # ordering = ('ingredient',)
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
 

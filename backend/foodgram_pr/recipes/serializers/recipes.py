@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
@@ -12,6 +13,8 @@ from users.serializers import CustomUserSerializer
 
 from ..models import (Favorite, Recipe, RecipeIngredients, RecipeTags,
                       ShoppingCart)
+
+User = get_user_model()
 
 COOKING_TIME_ERROR = (
     'Время приготовления должно составлять не менее 1 минуты',
@@ -29,7 +32,7 @@ INGREDIENT_MIN_AMOUNT_ERROR = (
 )
 INGREDIENT_MAX_AMOUNT_ERROR = (
     'Количество ингредиента не может быть больше 32000!'
-     )
+    )
 
 
 class RecipeIngredientsSerializer(ModelSerializer):
@@ -139,7 +142,8 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
             MaxValueValidator(
                 MAX_COOKING_TIME,
                 message=COOKING_TIME_ERROR)
-             ))
+            )
+        )
 
     def validate_tags(self, value):
         if not value:
@@ -186,7 +190,7 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
         recipe_ingredients = [RecipeIngredients(
             recipe=recipe,
             ingredient=ingredient
-             ) for ingredient in ingredient_objs]
+            ) for ingredient in ingredient_objs]
         RecipeIngredients.objects.bulk_create(recipe_ingredients)
 
     def update(self, instance, validated_data):
