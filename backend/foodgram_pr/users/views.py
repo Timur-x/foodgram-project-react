@@ -49,9 +49,8 @@ class UserSubscribeViewSet(UserViewSet):
         # serializer = self.get_serializer(paginated_queryset, many=True)
 
         # return self.get_paginated_response(serializer.data)
-        return Response({
-                 'errors': 'АААААААААААА'
-                 }, status=HTTP_400_BAD_REQUEST)
+        return Response({'errors': 'АААААААААААА'},
+                        status=HTTP_400_BAD_REQUEST)
 
     @action(
         detail=True,
