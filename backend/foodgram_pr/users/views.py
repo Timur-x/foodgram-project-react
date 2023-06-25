@@ -34,7 +34,6 @@ class UserSubscribeViewSet(UserViewSet):
 
     @action(
         detail=False,
-        methods=('get',),
         serializer_class=SubscriptionSerializer,
         permission_classes=(IsAuthenticated, )
     )
