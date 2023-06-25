@@ -23,7 +23,7 @@ class CustomUserSerializer(UserSerializer):
         if Subscription.objects.filter(
                 user=user,
                 author=author
-                ).exists():
+                 ).exists():
             raise ValidationError('Подписка уже оформлена.')
 
         if user.is_anonymous:

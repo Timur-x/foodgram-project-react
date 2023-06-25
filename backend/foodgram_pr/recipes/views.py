@@ -86,7 +86,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             if not user.in_favorite.filter(recipe=recipe).exists():
                 raise exceptions.ValidationError(
                     'Рецепта нет в избранном, либо он уже удален.'
-                    )
+                     )
             favorite = get_object_or_404(Favorite, user=user, recipe=recipe)
             favorite.delete()
             return Response(status=HTTP_204_NO_CONTENT)
