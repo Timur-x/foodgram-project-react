@@ -73,35 +73,37 @@ class RecipeViewSet(viewsets.ModelViewSet):
         detail=True,
     )
     def favorite(self, request, pk=None):
-        user = request.user
-        recipe = get_object_or_404(Recipe, pk=pk)
+        # user = request.user
+        # recipe = get_object_or_404(Recipe, pk=pk)
 
-        if request.method == 'POST':
-            favorite, created = Favorite.objects.get_or_create(
-                user=user,
-                recipe=recipe
-                 )
-            if created:
-                serializer = ShortRecipeSerializer(favorite.recipe,
-                                                   context={'request': request}
-                                                   )
-                return Response(serializer.data,
-                                status=HTTP_201_CREATED
-                                )
-            return Response({'message': 'Рецепт уже в избранном.'},
-                            status=HTTP_400_BAD_REQUEST
-                            )
+        # if request.method == 'POST':
+        #     favorite, created = Favorite.objects.get_or_create(
+        #         user=user,
+        #         recipe=recipe
+        #          )
+        #     if created:
+        #         serializer = ShortRecipeSerializer(favorite.recipe,
+        #                                            context={'request': request}
+        #                                            )
+        #         return Response(serializer.data,
+        #                         status=HTTP_201_CREATED
+        #                         )
+        #     return Response({'message': 'Рецепт уже в избранном.'},
+        #                     status=HTTP_400_BAD_REQUEST
+        #                     )
 
-        if request.method == 'DELETE':
-            try:
-                favorite = Favorite.objects.get(user=user, recipe=recipe)
-                favorite.delete()
-                return Response(status=HTTP_204_NO_CONTENT)
-            except Favorite.DoesNotExist:
-                return Response({'message': 'Рецепт не найден в избранном.'},
-                                status=HTTP_400_BAD_REQUEST)
+        # if request.method == 'DELETE':
+        #     try:
+        #         favorite = Favorite.objects.get(user=user, recipe=recipe)
+        #         favorite.delete()
+        #         return Response(status=HTTP_204_NO_CONTENT)
+        #     except Favorite.DoesNotExist:
+        #         return Response({'message': 'Рецепт не найден в избранном.'},
+        #                         status=HTTP_400_BAD_REQUEST)
 
-        return Response(status=HTTP_405_METHOD_NOT_ALLOWED)
+        # return Response(status=HTTP_405_METHOD_NOT_ALLOWED)
+        return Response({'errors': 'избронное'},
+                        status=HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=('post', 'delete'))
     def shopping_cart(self, request, pk=None):
