@@ -38,7 +38,7 @@ class UserSubscribeViewSet(UserViewSet):
     @action(detail=False, permission_classes=(IsAuthenticated,))
     def subscriptions(self, request):
         self.get_serializer
-        queryset = User.objects.filter(subscribing__user=request.user)
+        queryset = User.objects.filter(subscribers__user=request.user)
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_subscribtion_serializer(page, many=True)
