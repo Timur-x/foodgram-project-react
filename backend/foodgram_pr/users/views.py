@@ -1,9 +1,9 @@
 from django.shortcuts import get_object_or_404
 from djoser.views import TokenCreateView, UserViewSet
-from recipes.permissions import IsAuthorOrAdminOrReadOnly
 from rest_framework import exceptions
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
                                    HTTP_400_BAD_REQUEST,
@@ -12,6 +12,8 @@ from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
 from .models import Subscription, User
 from .pagination import CustomPageNumberPagination
 from .serializers import SubscriptionSerializer
+
+# from recipes.permissions import IsAuthorOrAdminOrReadOnly
 
 
 class TokenCreateWithCheckBlockStatusView(TokenCreateView):
@@ -25,7 +27,7 @@ class TokenCreateWithCheckBlockStatusView(TokenCreateView):
 
 
 class UserSubscribeViewSet(UserViewSet):
-    permission_classes = (IsAuthorOrAdminOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = CustomPageNumberPagination
 
     @action(

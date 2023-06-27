@@ -4,7 +4,8 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import exceptions, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
+from rest_framework.permissions import (SAFE_METHODS, IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
                                    HTTP_204_NO_CONTENT,
@@ -14,7 +15,7 @@ from users.pagination import CustomPageNumberPagination
 from .filters import RecipeFilter
 from .models import (Favorite, Ingredient, Recipe, RecipeIngredients,
                      ShoppingCart)
-from .permissions import IsAuthorOrAdminOrReadOnly
+# from .permissions import IsAuthorOrAdminOrReadOnly
 from .serializers.recipes import RecipeCreateUpdateSerializer, RecipeSerializer
 from .serializers.shortrecipes import ShortRecipeSerializer
 
@@ -23,7 +24,7 @@ FILE_NAME = 'Список покупок.txt'
 
 class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPageNumberPagination
-    permission_classes = (IsAuthorOrAdminOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     queryset = Recipe.objects.all()
