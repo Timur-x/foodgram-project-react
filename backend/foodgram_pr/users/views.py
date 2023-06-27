@@ -36,7 +36,7 @@ class UserSubscribeViewSet(UserViewSet):
     )
     def subscriptions(self, request):
         user = self.request.user
-        user_subscriptions = user.subscribers.all()
+        user_subscriptions = user.subscriber.all()
         authors = [item.author.id for item in user_subscriptions]
         queryset = User.objects.filter(pk__in=authors)
         # queryset = self.filter_queryset.all()
