@@ -38,17 +38,16 @@ class UserSubscribeViewSet(UserViewSet):
     )
     def subscriptions(self, request):
         user = self.request.user
-        user_subscriptions = user.subscribers.all()
+        user_subscriptions = user.subscriber.all()
         authors = [item.author.id for item in user_subscriptions]
         queryset = User.objects.filter(pk__in=authors)
         if not queryset.exists():  # проверяем, пустой ли queryset
             return Response({"detail": "No subscriptions found."}, status=200)
         # queryset = self.filter_queryset(queryset).all()
-        paginator = CustomPageNumberPagination
-        paginated_queryset = paginator.paginate_queryset(queryset, request)
+        paginated_queryset = self.paginate_queryset(queryset, request)
         serializer = self.get_serializer(paginated_queryset, many=True)
 
-        return paginator.get_paginated_response(serializer.data)
+        return self.get_paginated_response(serializer.data)
 
     @action(
         detail=True,
