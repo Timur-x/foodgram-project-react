@@ -41,7 +41,8 @@ class UserSubscribeViewSet(UserViewSet):
         user_subscriptions = user.subscribers.all()
         authors = [item.author.id for item in user_subscriptions]
         queryset = User.objects.filter(pk__in=authors)
-        queryset = self.filter_queryset(queryset)
+        queryset = self.filter_queryset(queryset).all()
+
         paginated_queryset = self.paginate_queryset(queryset, request)
         serializer = self.get_serializer(paginated_queryset, many=True)
 
