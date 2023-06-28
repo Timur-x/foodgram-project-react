@@ -1,28 +1,16 @@
-# from django.db.models.signals import post_save
-# from django.dispatch import receiver
-# from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
-# from recipes.models import ShoppingCart
-# from rest_framework import exceptions
-# from rest_framework.authtoken.models import Token
+from rest_framework import exceptions
 from rest_framework.decorators import action
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
-from rest_framework.status import HTTP_400_BAD_REQUEST
+from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
+                                   HTTP_405_METHOD_NOT_ALLOWED)
 
-from .models import User
+from .models import Subscription, User
 from .pagination import CustomPageNumberPagination
 from .serializers import CustomUserSerializer, SubscriptionSerializer
-
-# class TokenCreateWithCheckBlockStatusView(TokenCreateView):
-#     def _action(self, serializer):
-#         if serializer.user.is_blocked:
-#             return Response(
-#                 {'errors': 'аккаунт заблокирован!'},
-#                 status=HTTP_400_BAD_REQUEST,
-#             )
-#         return super()._action(serializer)
 
 
 class UserSubscribeViewSet(UserViewSet):
@@ -47,7 +35,6 @@ class UserSubscribeViewSet(UserViewSet):
         serializer = self.get_serializer(paginated_queryset, many=True)
 
         return self.get_paginated_response(serializer.data)
-
 
     @action(
         detail=True,
