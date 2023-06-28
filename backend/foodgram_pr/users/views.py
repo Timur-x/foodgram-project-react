@@ -1,32 +1,20 @@
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from djoser.views import TokenCreateView, UserViewSet
-from rest_framework import exceptions
+from djoser.views import UserViewSet
+from rest_framework import exceptions, status
 from rest_framework.decorators import action
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
-from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
-                                   HTTP_400_BAD_REQUEST,
-                                   HTTP_405_METHOD_NOT_ALLOWED)
 
-from .models import Subscription, User
+from .models import Subscription
 from .pagination import CustomPageNumberPagination
 from .serializers import SubscriptionSerializer
 
-# from recipes.permissions import IsAuthorOrAdminOrReadOnly
+User = get_user_model()
 
 
-class TokenCreateWithCheckBlockStatusView(TokenCreateView):
-    def _action(self, serializer):
-        if serializer.user.is_blocked:
-            return Response(
-                {'errors': 'аккаунт заблокирован!'},
-                status=HTTP_400_BAD_REQUEST,
-            )
-        return super()._action(serializer)
-
-
-class UserSubscribeViewSet(UserViewSet):
+class CustomUserViewSet(UserViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = CustomPageNumberPagination
 
@@ -38,13 +26,10 @@ class UserSubscribeViewSet(UserViewSet):
     )
     def subscriptions(self, request):
         user = self.request.user
-        user_subscriptions = user.subscriber.all()
+        user_subscriptions = user.subscribes.all()
         authors = [item.author.id for item in user_subscriptions]
         queryset = User.objects.filter(pk__in=authors)
-        if not queryset.exists():  # проверяем, пустой ли queryset
-            return Response({"detail": "No subscriptions found."}, status=200)
-        # queryset = self.filter_queryset(queryset).all()
-        paginated_queryset = self.paginate_queryset(queryset, request)
+        paginated_queryset = self.paginate_queryset(queryset)
         serializer = self.get_serializer(paginated_queryset, many=True)
 
         return self.get_paginated_response(serializer.data)
@@ -72,7 +57,7 @@ class UserSubscribeViewSet(UserViewSet):
             Subscription.objects.create(user=user, author=author)
             serializer = self.get_serializer(author)
 
-            return Response(serializer.data, status=HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if self.request.method == 'DELETE':
             if not Subscription.objects.filter(
@@ -90,6 +75,6 @@ class UserSubscribeViewSet(UserViewSet):
             )
             subscription.delete()
 
-            return Response(status=HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
-        return Response(status=HTTP_405_METHOD_NOT_ALLOWED)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
