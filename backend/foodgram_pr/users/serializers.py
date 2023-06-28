@@ -45,22 +45,17 @@ class CustomUserSerializer(UserSerializer):
 
 class SubscriptionSerializer(CustomUserSerializer):
     recipes = SerializerMethodField(method_name='get_recipes')
-    recipes_count = SerializerMethodField(
-        method_name='get_recipes_count'
-    )
+    recipes_count = SerializerMethodField(method_name='get_recipes_count')
 
     def get_srs(self):
         from recipes.serializers.shortrecipes import ShortRecipeSerializer
-
         return ShortRecipeSerializer
 
     def get_recipes(self, obj):
         author_recipes = Recipe.objects.filter(author=obj)
-
         if 'recipes_limit' in self.context.get('request').GET:
             recipes_limit = self.context.get('request').GET['recipes_limit']
             author_recipes = author_recipes[:int(recipes_limit)]
-
         if author_recipes:
             serializer = self.get_srs()(
                 author_recipes,
@@ -68,7 +63,6 @@ class SubscriptionSerializer(CustomUserSerializer):
                 many=True
             )
             return serializer.data
-
         return []
 
     def get_recipes_count(self, obj):
