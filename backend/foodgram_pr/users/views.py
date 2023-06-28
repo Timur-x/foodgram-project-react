@@ -18,10 +18,12 @@ from .serializers import SubscriptionSerializer
 
 class TokenCreateWithCheckBlockStatusView(TokenCreateView):
     def _action(self, serializer):
-        if not serializer.user.is_blocked():
+        if serializer.user.is_blocked:
             return Response(
-                {'errors': 'аккаунт временно заблокирован!'},
-                status=HTTP_400_BAD_REQUEST,)
+                {'errors': 'аккаунт заблокирован!'},
+                status=HTTP_400_BAD_REQUEST,
+            )
+        return super()._action(serializer)
 
 
 class UserSubscribeViewSet(UserViewSet):
