@@ -2,20 +2,18 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from ingredients.models import Ingredient
 from rest_framework import exceptions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from users.pagination import CustomPageNumberPagination
 
 from .filters import RecipeFilter
 from .models import Favorite, Recipe, RecipeIngredients, ShoppingCart
 from .permissions import IsAuthorOrAdminPermission
-from .serializers.recipes import RecipeCreateUpdateSerializer, RecipeSerializer
-from .serializers.shortrecipes import ShortRecipeSerializer
-
-FILE_NAME = 'Cписок покупок:'
+from .serializers import (RecipeCreateUpdateSerializer, RecipeSerializer,
+                          ShortRecipeSerializer)
+from ingredients.models import Ingredient
+from users.pagination import CustomPageNumberPagination
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -114,7 +112,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         methods=('get',),
         permission_classes=(IsAuthenticated,)
     )
-    def download_shopping_cart(self, request):
+    def down_shopping_cart(self, request):
         shopping_cart = ShoppingCart.objects.filter(user=self.request.user)
         recipes = [item.recipe.id for item in shopping_cart]
         buy_list = RecipeIngredients.objects.filter(
@@ -125,18 +123,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
             amount=Sum('amount')
         )
 
-        content = 'Список покупок :\n\n'
+        buy_list_text = 'Список покупок с сайта Foodgram:\n\n'
         for item in buy_list:
             ingredient = Ingredient.objects.get(pk=item['ingredient'])
             amount = item['amount']
-            content += (
+            buy_list_text += (
                 f'{ingredient.name}, {amount} '
                 f'{ingredient.measurement_unit}\n'
             )
 
-        response = HttpResponse(
-            content, content_type='text/plain,charset=utf8'
+        response = HttpResponse(buy_list_text, content_type="text/plain")
+        response['Content-Disposition'] = (
+            'attachment; filename=shopping-list.txt'
         )
-        response['Content-Disposition'] = f'attachment; filename={FILE_NAME}'
 
         return response

@@ -1,25 +1,24 @@
-from django.db.models import CharField, Model, UniqueConstraint
+from django.db import models
 
 
-class Ingredient(Model):
-    name = CharField(
+class Ingredient(models.Model):
+    name = models.CharField(
         max_length=200,
-        verbose_name='Название',
-        help_text='Название',
+        verbose_name='Название ингредиента',
+        help_text='Название ингредиента',
     )
-    measurement_unit = CharField(
-        max_length=200,
-        verbose_name='Единица измерения',
-        help_text='Единица измерения',
+    measurement_unit = models.CharField(
+        max_length=10,
+        verbose_name='Единица измерения ингредиента',
+        help_text='Единица измерения ингредиента',
     )
 
     class Meta:
-        verbose_name = 'Ингредиент'
+        verbose_name = 'ингредиент'
         verbose_name_plural = 'Ингредиенты'
-        ordering = ('name',)
 
         constraints = (
-            UniqueConstraint(
+            models.UniqueConstraint(
                 fields=('name', 'measurement_unit'),
                 name='unique_ingredient'
             ),

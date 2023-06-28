@@ -1,10 +1,10 @@
-from django.contrib.admin import ModelAdmin, register
+from django.contrib import admin
 
 from .models import Tag
 
 
-@register(Tag)
-class TagAdmin(ModelAdmin):
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'color', 'slug')
     search_fields = ('name',)
     prepopulated_fields = {'slug': ('name',)}

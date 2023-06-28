@@ -1,10 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
+
 from ingredients.models import Ingredient
 from tags.models import Tag
-
-from .serializers.recipes import COOKING_TIME_MIN
 
 User = get_user_model()
 
@@ -12,28 +11,28 @@ User = get_user_model()
 class Recipe(models.Model):
     name = models.CharField(
         max_length=200,
-        verbose_name='Название',
-        help_text='Название',
+        verbose_name='Название рецепта',
+        help_text='Название рецепта',
     )
     text = models.TextField(
-        verbose_name='Описание',
-        help_text='Описание',
+        verbose_name='Описание рецепта',
+        help_text='Описание рецепта',
     )
     ingredients = models.ManyToManyField(
         Ingredient,
         through='RecipeIngredients',
         related_name='recipes',
-        verbose_name='Список ингредиентов',
-        help_text='Список ингредиентов',
+        verbose_name='Игредиенты для рецепта',
+        help_text='Игредиенты для рецепта',
     )
     cooking_time = models.PositiveSmallIntegerField(
-        validators=(MinValueValidator(COOKING_TIME_MIN),),
+        validators=(MinValueValidator(1),),
         verbose_name='Время приготовления (в минутах)',
         help_text='Время приготовления (в минутах)',
     )
     image = models.ImageField(
-        verbose_name='Картинка, закодированная в Base64',
-        help_text='Картинка, закодированная в Base64',
+        verbose_name='Изображение для рецепта',
+        help_text='Изображение для рецепта',
         upload_to='recipes/',
     )
     pub_date = models.DateTimeField(
@@ -44,19 +43,19 @@ class Recipe(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='recipes',
-        verbose_name='Автор'
+        verbose_name='Автор рецепта'
     )
     tags = models.ManyToManyField(
         Tag,
         through='RecipeTags',
         related_name='recipes',
-        verbose_name='Список id тегов',
-        help_text='Список id тегов',
+        verbose_name='Теги рецепта',
+        help_text='Теги рецепта',
     )
 
     class Meta:
         ordering = ('-pub_date',)
-        verbose_name = 'рецепты'
+        verbose_name = 'рецепт'
         verbose_name_plural = 'Рецепты'
 
     def __str__(self):
@@ -75,12 +74,12 @@ class RecipeIngredients(models.Model):
         verbose_name='Ингредиент'
     )
     amount = models.PositiveSmallIntegerField(
+        validators=(MinValueValidator(1),),
         verbose_name='Количество'
     )
 
     class Meta:
-        # ordering = ('ingredient',)
-        verbose_name = 'Ингредиент'
+        verbose_name = 'ингредиенты'
         verbose_name_plural = 'Ингредиенты'
 
     def __str__(self):
@@ -151,9 +150,8 @@ class ShoppingCart(models.Model):
     )
 
     class Meta:
-        ordering = ('-user',)
-        verbose_name = 'Список'
-        verbose_name_plural = 'Список'
+        verbose_name = 'список покупок'
+        verbose_name_plural = 'Список покупок'
 
         constraints = (
             models.UniqueConstraint(
@@ -164,31 +162,3 @@ class ShoppingCart(models.Model):
 
     def __str__(self):
         return f'Рецепт {self.recipe} в списке покупок у {self.user}'
-
-
-class CountOfIngredient(models.Model):
-    ingredient = models.ForeignKey(
-        Ingredient,
-        on_delete=models.CASCADE,
-        related_name='count_in_recipes',
-        verbose_name='Ингредиент',
-    )
-    amount = models.PositiveIntegerField(
-        verbose_name='Количество'
-    )
-
-    class Meta:
-        verbose_name = 'Количество ингредиента'
-        verbose_name_plural = 'Количество ингредиентов'
-        constraints = (
-            models.UniqueConstraint(
-                fields=('ingredient', 'amount',),
-                name='unique_ingredient_amount',
-            ),
-        )
-
-    def __str__(self):
-        return (
-            f'{self.ingredient.name} - {self.amount}'
-            f' ({self.ingredient.measurement_unit})'
-        )
