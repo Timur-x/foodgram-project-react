@@ -1,26 +1,14 @@
-from django.db import models
+from django.db.models import CharField, Model, SlugField
 
 
-class Tag(models.Model):
-    name = models.CharField(
-        max_length=200,
-        verbose_name='Название тега',
-        help_text='Название тега',
-    )
-    color = models.CharField(
-        max_length=7,
-        verbose_name='Цвет для тега',
-        help_text='Цвет для тега',
-    )
-    slug = models.SlugField(
-        max_length=50,
-        unique=True,
-        verbose_name='Идентификатор тега',
-        help_text='Идентификатор тега',
-    )
+class Tag(Model):
+    name = CharField('Название', max_length=200)
+    color = CharField('Цвет в HEX', max_length=7)
+    slug = SlugField('Уникальный слаг', max_length=200, unique=True)
 
     class Meta:
-        verbose_name = 'тег'
+        ordering = ('name',)
+        verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
 
     def __str__(self):

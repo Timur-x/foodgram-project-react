@@ -1,11 +1,14 @@
-from rest_framework import filters, viewsets
+from django_filters.rest_framework.backends import DjangoFilterBackend
+from recipes.filters import IngredientSearchFilter
+from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from .models import Ingredient
 from .serializers import IngredientSerializer
 
 
-class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Ingredient.objects.all()
+class IngredientViewSet(ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('^name',)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = IngredientSearchFilter
+    queryset = Ingredient.objects.all()
+    http_method_names = ('get',)
