@@ -7,7 +7,6 @@ from rest_framework.permissions import (IsAuthenticated,
 from rest_framework.response import Response
 from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
                                    HTTP_405_METHOD_NOT_ALLOWED)
-
 from .models import Subscription, User
 from .pagination import CustomPageNumberPagination
 from .serializers import CustomUserSerializer, SubscriptionSerializer
@@ -26,13 +25,14 @@ class UserSubscribeViewSet(UserViewSet):
         permission_classes=(IsAuthenticated, )
     )
     def subscriptions(self, request):
-        user = self.request.user
-        user_subscriptions = user.subscribers.all()
-        authors = [item.author.id for item in user_subscriptions]
-        queryset = User.objects.filter(pk__in=authors)
-        queryset = self.filter_queryset.all()
+        # user = self.request.user
+        # user_subscriptions = user.subscribers.all()
+        # authors = [item.author.id for item in user_subscriptions]
+        # queryset = User.objects.filter(pk__in=authors)
+        queryset = self.filter_queryset(self.get_queryset())
         paginated_queryset = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(paginated_queryset, many=True)
+        serializer = self.get_serializer(paginated_queryset, many=True,
+                                         context={'request': request})
 
         return self.get_paginated_response(serializer.data)
 
@@ -43,9 +43,9 @@ class UserSubscribeViewSet(UserViewSet):
     )
     def subscribe(self, request, id=None):
         user = self.request.user
-        author = get_object_or_404(User, pk=id)
+        author = self.get_object()
 
-        if self.request.method == 'POST':
+        if request.method == 'POST':
             if user == author:
                 raise exceptions.ValidationError(
                     'Подписатся на самого себя нельзя.'
@@ -57,11 +57,10 @@ class UserSubscribeViewSet(UserViewSet):
                 raise exceptions.ValidationError('Подписка уже оформлена.')
 
             Subscription.objects.create(user=user, author=author)
-            serializer = self.get_serializer(author)
 
-            return Response(serializer.data, status=HTTP_201_CREATED)
+            return Response(status=HTTP_201_CREATED)
 
-        if self.request.method == 'DELETE':
+        if request.method == 'DELETE':
             if not user.subscribers.filter(author=author).exists():
                 raise exceptions.ValidationError(
                     'Подписка уже удалена.'
