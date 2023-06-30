@@ -16,7 +16,8 @@ class CustomUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context['request'].user
-        author = get_object_or_404(User, pk=id)
+        author_id = self.context['request'].data.get('id')
+        author = get_object_or_404(User, pk=author_id)
         if user == author:
             raise ValidationError(
                     'Подписка на самого себя запрещена.'
