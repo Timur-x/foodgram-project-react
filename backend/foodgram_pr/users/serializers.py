@@ -10,6 +10,7 @@ from .models import Subscription, User
 
 
 class CustomUserSerializer(UserSerializer):
+    ''' Сериализация подписки '''
     is_subscribed = SerializerMethodField(
         method_name='get_is_subscribed'
     )
@@ -45,7 +46,16 @@ class CustomUserSerializer(UserSerializer):
                   'is_subscribed')
 
 
+class CustomUserCreateSerializer(UserCreateSerializer):
+    '''Сериализатор для создания User '''
+    class Meta:
+        model = User
+        fields = ('email', 'id', 'username', 'first_name',
+                  'last_name', 'password')
+
+
 class SubscriptionSerializer(CustomUserSerializer):
+    ''' Cериализатор для модели User '''
     recipes = SerializerMethodField(method_name='get_recipes')
     recipes_count = SerializerMethodField(
         method_name='get_recipes_count'
@@ -80,11 +90,3 @@ class SubscriptionSerializer(CustomUserSerializer):
         model = User
         fields = ('email', 'id', 'username', 'first_name', 'last_name',
                   'is_subscribed', 'recipes', 'recipes_count')
-
-
-class CustomUserCreateSerializer(UserCreateSerializer):
-
-    class Meta:
-        model = User
-        fields = ('email', 'id', 'username', 'first_name',
-                  'last_name', 'password')
