@@ -11,7 +11,7 @@ from .models import User
 
 
 class CustomUserSerializer(UserSerializer):
-    is_subscribed = SerializerMethodField('get_is_subscribed')
+    is_subscribed = SerializerMethodField('is_subscribed_user')
 
     class Meta:
         model = User
@@ -23,11 +23,11 @@ class CustomUserSerializer(UserSerializer):
             'password': {'write_only': True, 'required': True},
         }
 
-    def get_is_subscribed(self, obj):
+    def is_subscribed_user(self, obj):
         user = self.context['request'].user
         return (
             user.is_authenticated
-            and obj.subscribes.filter(user=user).exists()
+            and obj.subscribers.filter(user=user).exists()
         )
 
     def create(self, validated_data):
