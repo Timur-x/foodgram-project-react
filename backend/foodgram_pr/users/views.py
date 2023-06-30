@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
                                    HTTP_405_METHOD_NOT_ALLOWED)
 
-from .models import User, Subscription
+from .models import Subscription, User
 from .pagination import CustomPageNumberPagination
 from .serializers import CustomUserSerializer, SubscriptionSerializer
 
@@ -47,7 +47,6 @@ class UserSubscribeViewSet(UserViewSet):
         serializer = self.get_serializer(paginated_queryset, many=True)
 
         return self.get_paginated_response(serializer.data)
-
 
     @action(
         detail=True,
