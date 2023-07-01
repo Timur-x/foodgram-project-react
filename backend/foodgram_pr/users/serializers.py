@@ -23,17 +23,17 @@ class CustomUserSerializer(UserSerializer):
         if user.is_anonymous:
             return False
 
-        author_id = self.context['request'].data.get('id')
-        author = get_object_or_404(User, pk=author_id)
-        if user == author:
-            raise ValidationError(
-                    'Подписка на самого себя запрещена.'
-                )
-        if Subscription.objects.filter(
-                user=user,
-                author=author
-                 ).exists():
-            raise ValidationError('Подписка уже оформлена.')
+        # author_id = self.context['request'].data.get('id')
+        # author = get_object_or_404(User, pk=author_id)
+        # if user == author:
+        #     raise ValidationError(
+        #             'Подписка на самого себя запрещена.'
+        #         )
+        # if Subscription.objects.filter(
+        #         user=user,
+        #         author=author
+        #          ).exists():
+        #     raise ValidationError('Подписка уже оформлена.')
 
         # if user is None:
         #     return False
