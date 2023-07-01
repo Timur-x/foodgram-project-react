@@ -27,7 +27,7 @@ from .serializers import CustomUserSerializer, SubscriptionSerializer
 
 
 class UserSubscribeViewSet(UserViewSet):
-    ''' Подписка на пользователя и удалаление подписки '''
+    '''Подписка на пользователя и удалаление подписки.'''
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
