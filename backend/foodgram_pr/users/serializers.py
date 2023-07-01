@@ -1,8 +1,8 @@
-# from django.contrib.auth.hashers import make_password
-# from django.shortcuts import get_object_or_404
+from django.contrib.auth.hashers import make_password
+from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.models import Recipe
-# from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import SerializerMethodField
 
 # from rest_framework.validators import UniqueValidator
@@ -23,28 +23,28 @@ class CustomUserSerializer(UserSerializer):
         if user.is_anonymous:
             return False
 
-        # author_id = self.context['request'].data.get('id')
-        # author = get_object_or_404(User, pk=author_id)
-        # if user == author:
-        #     raise ValidationError(
-        #             'Подписка на самого себя запрещена.'
-        #         )
-        # if Subscription.objects.filter(
-        #         user=user,
-        #         author=author
-        #          ).exists():
-        #     raise ValidationError('Подписка уже оформлена.')
+        author_id = self.context['request'].data.get('id')
+        author = get_object_or_404(User, pk=author_id)
+        if user == author:
+            raise ValidationError(
+                    'Подписка на самого себя запрещена.'
+                )
+        if Subscription.objects.filter(
+                user=user,
+                author=author
+                 ).exists():
+            raise ValidationError('Подписка уже оформлена.')
 
         # if user is None:
         #     return False
 
         return Subscription.objects.filter(user=user, author=obj).exists()
 
-    # def create(self, validated_data):
-    #     validated_data['password'] = (
-    #         make_password(validated_data.pop('password'))
-    #     )
-    #     return super().create(validated_data)
+    def create(self, validated_data):
+        validated_data['password'] = (
+            make_password(validated_data.pop('password'))
+        )
+        return super().create(validated_data)
 
     class Meta:
         model = User
