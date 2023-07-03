@@ -6,7 +6,7 @@ from recipes.models import Recipe
 from rest_framework.serializers import SerializerMethodField
 
 # from rest_framework.validators import UniqueValidator
-from .models import Subscription, User
+from .models import User
 
 
 class CustomUserSerializer(UserSerializer):
@@ -16,12 +16,11 @@ class CustomUserSerializer(UserSerializer):
     )
 
     def get_is_subscribed(self, obj):
-        request = self.context.get('request')
-        user = request.user
-        if not user or user.is_anonymous:
-            return False
-        queryset = Subscription.objects.all()
-        return queryset.filter(user=user, author=obj).exists()
+        user = self.context['request'].user
+        return (
+            user.is_authenticated
+            and obj.subscribers.filter(user=user).exists()
+        )
 
     def create(self, validated_data):
         validated_data['password'] = (
@@ -32,7 +31,7 @@ class CustomUserSerializer(UserSerializer):
     class Meta:
         model = User
         fields = ('email', 'id', 'username', 'first_name', 'last_name',
-                  'is_subscribed')
+                  'is_subscribed', 'recipes', 'recipes_count')
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
