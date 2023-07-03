@@ -21,9 +21,8 @@ class CustomUserSerializer(UserSerializer):
             return (
                 user.is_authenticated
                 and obj.subscribers.filter(user=user).exists()
-                )
-        else:
-            return False
+                 )
+        return False
 
     def create(self, validated_data):
         validated_data['password'] = (
