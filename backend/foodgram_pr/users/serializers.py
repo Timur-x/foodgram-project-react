@@ -1,7 +1,7 @@
 from django.contrib.auth.hashers import make_password
+from recipes.serializers.shortrecipes import ShortRecipeSerializer
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
-from recipes.serializers.shortrecipes import ShortRecipeSerializer
 from .models import User
 
 
@@ -22,7 +22,7 @@ class UserSerializer(ModelSerializer):
         user = self.context['request'].user
         return (
             user.is_authenticated
-            and obj.subscribing.filter(user=user).exists()
+            and obj.subscribers.filter(user=user).exists()
         )
 
     def create(self, validated_data):
