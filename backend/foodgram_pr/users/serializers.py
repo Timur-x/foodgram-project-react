@@ -31,7 +31,7 @@ class CustomUserSerializer(UserSerializer):
     class Meta:
         model = User
         fields = ('email', 'id', 'username', 'first_name', 'last_name',
-                  'is_subscribed', 'recipes', 'recipes_count')
+                  'is_subscribed')
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
