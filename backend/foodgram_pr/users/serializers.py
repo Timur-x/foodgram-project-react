@@ -22,6 +22,8 @@ class CustomUserSerializer(UserSerializer):
         #     None
         if user.is_anonymous:
             return False
+        if not user.is_authenticated:
+            return False
 
         author_id = self.context['request'].data.get('id')
         author = get_object_or_404(User, pk=author_id)
