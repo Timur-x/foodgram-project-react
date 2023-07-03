@@ -1,7 +1,7 @@
 from django.contrib.auth.hashers import make_password
 # from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from recipes.models import Recipe
+from recipes.serializers.shortrecipes import ShortRecipeSerializer
 # from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import SerializerMethodField
 
@@ -10,7 +10,7 @@ from .models import User
 
 
 class CustomUserSerializer(UserSerializer):
-    '''Сериализация подписки.'''
+    '''Сериализация User.'''
     is_subscribed = SerializerMethodField(
         method_name='get_is_subscribed'
     )
@@ -37,6 +37,7 @@ class CustomUserSerializer(UserSerializer):
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
+    '''Сериализатор для регистрации пользователей.'''
     class Meta:
         model = User
         fields = (
@@ -50,36 +51,12 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
 
 class SubscriptionSerializer(CustomUserSerializer):
-    '''Cериализатор для модели User.'''
-    recipes = SerializerMethodField(method_name='get_recipes')
-    recipes_count = SerializerMethodField(
-        method_name='get_recipes_count'
-    )
-
-    def get_srs(self):
-        from recipes.serializers.shortrecipes import ShortRecipeSerializer
-
-        return ShortRecipeSerializer
-
-    def get_recipes(self, obj):
-        author_recipes = Recipe.objects.filter(author=obj)
-
-        if 'recipes_limit' in self.context.get('request').GET:
-            recipes_limit = self.context.get('request').GET['recipes_limit']
-            author_recipes = author_recipes[:int(recipes_limit)]
-
-        if author_recipes:
-            serializer = self.get_srs()(
-                author_recipes,
-                context={'request': self.context.get('request')},
-                many=True
-            )
-            return serializer.data
-
-        return []
+    '''Cериализатор для подписки.'''
+    recipes = ShortRecipeSerializer(many=True)
+    recipes_count = SerializerMethodField()
 
     def get_recipes_count(self, obj):
-        return Recipe.objects.filter(author=obj).count()
+        return obj.recipes.count()
 
     class Meta:
         model = User
