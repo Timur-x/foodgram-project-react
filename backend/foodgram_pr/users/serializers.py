@@ -17,15 +17,13 @@ class CustomUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context['request'].user
-        if self.context['request'].user.is_authenticated
-        else :
-            None
-        if user is None:
+        if self.context['request'].user.is_authenticated:
+            return (
+                user.is_authenticated
+                and obj.subscribers.filter(user=user).exists()
+                )
+        else:
             return False
-        return (
-            user.is_authenticated
-            and obj.subscribers.filter(user=user).exists()
-        )
 
     def create(self, validated_data):
         validated_data['password'] = (
