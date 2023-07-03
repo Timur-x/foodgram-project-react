@@ -1,8 +1,8 @@
-from django.contrib.auth.hashers import make_password
-from django.shortcuts import get_object_or_404
+# from django.contrib.auth.hashers import make_password
+# from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.models import Recipe
-from rest_framework.exceptions import ValidationError
+# from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import SerializerMethodField
 
 # from rest_framework.validators import UniqueValidator
