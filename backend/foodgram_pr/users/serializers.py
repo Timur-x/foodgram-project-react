@@ -1,8 +1,8 @@
-# from django.contrib.auth.hashers import make_password
-# from django.shortcuts import get_object_or_404
+from django.contrib.auth.hashers import make_password
+from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.models import Recipe
-# from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import SerializerMethodField
 
 # from rest_framework.validators import UniqueValidator
@@ -17,11 +17,15 @@ class CustomUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context['request'].user
+        if user.is_authenticated:
+            return bool(obj.subscribers.filter(user=user))
+        return False
 
-        if user.is_anonymous:
-            return False
-
-        return Subscription.objects.filter(user=user, author=obj).exists()
+    def create(self, validated_data):
+        validated_data['password'] = (
+            make_password(validated_data.pop('password'))
+        )
+        return super().create(validated_data)
 
     class Meta:
         model = User
