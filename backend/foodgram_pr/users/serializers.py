@@ -24,6 +24,8 @@ class CustomUserSerializer(UserSerializer):
             return False
         if not user.is_authenticated:
             return False
+        if not hasattr(user, 'email'):
+            return False
 
         author_id = self.context['request'].data.get('id')
         author = get_object_or_404(User, pk=author_id)
