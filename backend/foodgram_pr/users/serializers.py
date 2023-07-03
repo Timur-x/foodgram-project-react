@@ -17,38 +17,11 @@ class CustomUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context['request'].user
-        # if self.context['request'].user.is_authenticated
-        # else:
-        #     None
+
         if user.is_anonymous:
             return False
-        if not user.is_authenticated:
-            return False
-        if not hasattr(user, 'email'):
-            return False
-
-        author_id = self.context['request'].data.get('id')
-        author = get_object_or_404(User, pk=author_id)
-        if user == author:
-            raise ValidationError(
-                    'Подписка на самого себя запрещена.'
-                )
-        if Subscription.objects.filter(
-                user=user,
-                author=author
-                 ).exists():
-            raise ValidationError('Подписка уже оформлена.')
-
-        # if user is None:
-        #     return False
 
         return Subscription.objects.filter(user=user, author=obj).exists()
-
-    def create(self, validated_data):
-        validated_data['password'] = (
-            make_password(validated_data.pop('password'))
-        )
-        return super().create(validated_data)
 
     class Meta:
         model = User
