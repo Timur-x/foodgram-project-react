@@ -1,4 +1,4 @@
-from django.contrib.auth.hashers import make_password
+# from django.contrib.auth.hashers import make_password
 # from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.models import Recipe
@@ -10,22 +10,16 @@ from .models import User
 
 
 class CustomUserSerializer(UserSerializer):
-    '''Сериализация подписки.'''
+    '''Сериализация User.'''
     is_subscribed = SerializerMethodField(
         method_name='get_is_subscribed'
     )
 
     def get_is_subscribed(self, obj):
         user = self.context['request'].user
-        if user.is_authenticated:
-            return bool(obj.subscribers.filter(user=user))
-        return False
-
-    def create(self, validated_data):
-        validated_data['password'] = (
-            make_password(validated_data.pop('password'))
-        )
-        return super().create(validated_data)
+        return (
+            user.is_authenticated and bool(obj.subscriber.filter(user=user))
+         )
 
     class Meta:
         model = User
@@ -42,7 +36,7 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
 
 class SubscriptionSerializer(CustomUserSerializer):
-    '''Cериализатор для модели User.'''
+    '''Cериализатор для подписок.'''
     recipes = SerializerMethodField(method_name='get_recipes')
     recipes_count = SerializerMethodField(
         method_name='get_recipes_count'
