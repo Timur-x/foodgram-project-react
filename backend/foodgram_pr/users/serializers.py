@@ -6,12 +6,14 @@ from recipes.models import Recipe
 from rest_framework.serializers import SerializerMethodField
 
 # from rest_framework.validators import UniqueValidator
-from .models import User
+from .models import Subscription, User
 
 
 class CustomUserSerializer(UserSerializer):
     '''Сериализация User.'''
-    is_subscribed = SerializerMethodField()
+    is_subscribed = SerializerMethodField(
+        method_name='get_is_subscribed'
+    )
 
     class Meta:
         model = User
@@ -22,10 +24,11 @@ class CustomUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context['request'].user
-        return (
-            user.is_authenticated
-            and obj.subscribers.filter(user=user).exists()
-             )
+
+        if user.is_anonymous:
+            return False
+
+        return Subscription.objects.filter(user=user, author=obj).exists()
 
     def create(self, validated_data):
         validated_data['password'] = (
