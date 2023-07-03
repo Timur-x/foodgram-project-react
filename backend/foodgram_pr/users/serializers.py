@@ -30,11 +30,11 @@ class CustomUserSerializer(UserSerializer):
             raise ValidationError(
                     'Подписка на самого себя запрещена.'
                 )
-        if Subscription.objects.filter(
-                user=user,
-                author=author
-                 ).exists():
-            raise ValidationError('Подписка уже оформлена.')
+        # if Subscription.objects.filter(
+        #         user=user,
+        #         author=author
+        #          ).exists():
+        #     raise ValidationError('Подписка уже оформлена.')
 
         if user.is_anonymous:
             return False
