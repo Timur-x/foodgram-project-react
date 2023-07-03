@@ -28,9 +28,9 @@ from .serializers import CustomUserSerializer, SubscriptionSerializer
 
 class UserSubscribeViewSet(UserViewSet):
     '''Подписка на пользователя и удалаление подписки.'''
-    queryset = User.objects.all()
-    serializer_class = CustomUserSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    # queryset = User.objects.all()
+    # serializer_class = CustomUserSerializer
+    # permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = CustomPageNumberPagination
 
     @action(
