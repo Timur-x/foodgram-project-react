@@ -29,7 +29,7 @@ class CustomUserSerializer(UserSerializer):
         user = self.context['request'].user
         return (
             user.is_authenticated
-            and obj.subscribed_by.filter(user=user).exists()
+            and obj.subscribers.filter(user=user).exists()
              )
 
     def create(self, validated_data):
