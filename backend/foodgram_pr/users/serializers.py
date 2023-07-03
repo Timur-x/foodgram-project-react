@@ -1,12 +1,12 @@
 from django.contrib.auth.hashers import make_password
-# from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.models import Recipe
-# from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import SerializerMethodField
 
 # from rest_framework.validators import UniqueValidator
-from .models import User
+from .models import Subscription, User
 
 
 class CustomUserSerializer(UserSerializer):
@@ -17,12 +17,28 @@ class CustomUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context['request'].user
-        if self.context['request'].user.is_authenticated:
-            return (
-                user.is_authenticated
-                and obj.subscribers.filter(user=user).exists()
-                 )
-        return False
+        # if self.context['request'].user.is_authenticated
+        # else:
+        #     None
+        if user.is_anonymous:
+            return False
+
+        author_id = self.context['request'].data.get('id')
+        author = get_object_or_404(User, pk=author_id)
+        if user == author:
+            raise ValidationError(
+                    'Подписка на самого себя запрещена.'
+                )
+        if Subscription.objects.filter(
+                user=user,
+                author=author
+                 ).exists():
+            raise ValidationError('Подписка уже оформлена.')
+
+        # if user is None:
+        #     return False
+
+        return Subscription.objects.filter(user=user, author=obj).exists()
 
     def create(self, validated_data):
         validated_data['password'] = (
