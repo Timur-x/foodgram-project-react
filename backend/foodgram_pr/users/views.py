@@ -6,15 +6,14 @@ from djoser.views import UserViewSet
 from rest_framework import exceptions
 # from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
-from rest_framework.permissions import (IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
                                    HTTP_405_METHOD_NOT_ALLOWED)
 
 from .models import Subscription, User
 from .pagination import CustomPageNumberPagination
-from .serializers import CustomUserSerializer, SubscriptionSerializer
+from .serializers import SubscriptionSerializer
 
 # class TokenCreateWithCheckBlockStatusView(TokenCreateView):
 #     def _action(self, serializer):
