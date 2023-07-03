@@ -18,7 +18,7 @@ class CustomUserSerializer(UserSerializer):
     class Meta:
         model = User
         fields = (
-            'id', 'email', 'username', 'first_name', 'last_name', 'password',
+            'email', 'id', 'username', 'first_name', 'last_name', 'password',
             'is_subscribed',
         )
 
@@ -37,11 +37,16 @@ class CustomUserSerializer(UserSerializer):
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
-    '''Сериализатор для создания User.'''
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name',
-                  'last_name', 'password')
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'password'
+         )
 
 
 class SubscriptionSerializer(CustomUserSerializer):
