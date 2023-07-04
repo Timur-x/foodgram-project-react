@@ -28,7 +28,7 @@ class CustomUserSerializer(UserSerializer):
     def get_is_subscribed(self, obj):
         user = self.context['request'].user
         if user.is_anonymous:
-            return False 
+            return False
         author = get_object_or_404(User, pk=obj.pk)
         if user == author:
             raise ValidationError(
