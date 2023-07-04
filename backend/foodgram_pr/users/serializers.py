@@ -29,7 +29,7 @@ class CustomUserSerializer(UserSerializer):
         user = self.context['request'].user
         if user.is_anonymous:
             return False
-        return obj.subscribes.filter(user=user).exists()
+        return obj.subscribers.filter(user=user).exists()
 
     def create(self, validated_data):
         validated_data['password'] = (

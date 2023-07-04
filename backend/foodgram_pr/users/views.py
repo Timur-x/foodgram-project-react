@@ -6,14 +6,15 @@ from djoser.views import UserViewSet
 from rest_framework import exceptions
 # from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
                                    HTTP_405_METHOD_NOT_ALLOWED)
 
 from .models import Subscription, User
 from .pagination import CustomPageNumberPagination
-from .serializers import SubscriptionSerializer
+from .serializers import CustomUserSerializer, SubscriptionSerializer
 
 # class TokenCreateWithCheckBlockStatusView(TokenCreateView):
 #     def _action(self, serializer):
@@ -27,9 +28,9 @@ from .serializers import SubscriptionSerializer
 
 class UserSubscribeViewSet(UserViewSet):
     '''Подписка на пользователя и удалаление подписки.'''
-    # queryset = User.objects.all()
-    # serializer_class = CustomUserSerializer
-    # permission_classes = (IsAuthenticatedOrReadOnly,)
+    queryset = User.objects.all()
+    serializer_class = CustomUserSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = CustomPageNumberPagination
 
     @action(
@@ -40,12 +41,14 @@ class UserSubscribeViewSet(UserViewSet):
     )
     def subscriptions(self, request):
         user = self.request.user
+        user_subscriptions = user.subscribers.all()
+        authors = [item.author.id for item in user_subscriptions]
+        queryset = User.objects.filter(pk__in=authors)
+        # queryset = self.filter_queryset.all()
+        paginated_queryset = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(paginated_queryset, many=True)
 
-        def queryset():
-            return User.objects.filter(subscribers__user=user)
-
-        self.get_queryset = queryset
-        return self.list(request)
+        return self.get_paginated_response(serializer.data)
 
     @action(
         detail=True,
