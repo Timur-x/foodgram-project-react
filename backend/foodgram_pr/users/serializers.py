@@ -27,6 +27,8 @@ class CustomUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context['request'].user
+        if user.is_anonymous:
+            return False 
         author = get_object_or_404(User, pk=obj.pk)
         if user == author:
             raise ValidationError(
@@ -37,10 +39,6 @@ class CustomUserSerializer(UserSerializer):
                 author=author
                  ).exists():
             raise ValidationError('Подписка уже оформлена.')
-
-        if user.is_anonymous:
-            return False
-
         return Subscription.objects.filter(user=user, author=obj).exists()
 
     def create(self, validated_data):
