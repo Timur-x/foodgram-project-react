@@ -76,7 +76,7 @@ class UserSubscribeViewSet(UserViewSet):
             return Response(serializer.data, status=HTTP_201_CREATED)
 
         if self.request.method == 'DELETE':
-            if not user.subscribers.filter(author=author).exists():
+            if not user.subscribes.filter(author=author).exists():
                 raise exceptions.ValidationError(
                     'Подписка уже удалена.'
                 )
