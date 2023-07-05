@@ -96,9 +96,8 @@ class ShoppingCart(models.Model):
     )
     recipe = models.ManyToManyField(
         'recipes.Recipe',
-        on_delete=models.CASCADE,
         related_name='in_shopping_list',
-        verbose_name='Рецепт'
+        verbose_name='Рецепты'
     )
 
     class Meta:
