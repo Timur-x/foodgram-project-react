@@ -70,12 +70,12 @@ class UserSubscribeViewSet(UserViewSet):
                 )
             instance.delete()
             return Response(status=HTTP_204_NO_CONTENT)
-        data = {
-            'user': user.id,
-            'author': id
-        }
-        subscription = SubscriptionSerializer(data=data)
-        subscription.is_valid(raise_exception=True)
-        subscription.save()
+        # data = {
+        #     'user': user.id,
+        #     'author': id
+        # }
+        # subscription = SubscriptionSerializer(data=data)
+        # subscription.is_valid(raise_exception=True)
+        # subscription.save()
         serializer = self.get_serializer(author)
         return Response(serializer.data, status=HTTP_201_CREATED)
