@@ -16,6 +16,11 @@ from .serializers.recipes import RecipeCreateUpdateSerializer, RecipeSerializer
 from .serializers.shortrecipes import ShortRecipeSerializer
 
 FILE_NAME = 'Cписок покупок:'
+RECIPE_iIN_FAVORITES = 'Рецепт уже в избранном.'
+RECIPE_DELETED = 'Рецепта нет в избранном, либо он уже удален.'
+RECIPE_IN_THE_BASKET = 'Рецепт уже в списке покупок.'
+THE_RECIPE_HAS_BEEN_REMOVED_FROM_THE_TRASH = ('Рецепта нет в списке покупок,'
+                                              'либо он уже удален.')
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -41,7 +46,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 user=user,
                 recipe=recipe
             ).exists():
-                raise exceptions.ValidationError('Рецепт уже в избранном.')
+                raise exceptions.ValidationError(RECIPE_iIN_FAVORITES)
 
             Favorite.objects.create(user=user, recipe=recipe)
             serializer = ShortRecipeSerializer(
@@ -56,9 +61,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 user=user,
                 recipe=recipe
             ).exists():
-                raise exceptions.ValidationError(
-                    'Рецепта нет в избранном, либо он уже удален.'
-                )
+                raise exceptions.ValidationError(RECIPE_DELETED)
 
             favorite = get_object_or_404(Favorite, user=user, recipe=recipe)
             favorite.delete()
@@ -77,9 +80,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 user=user,
                 recipe=recipe
             ).exists():
-                raise exceptions.ValidationError(
-                    'Рецепт уже в списке покупок.'
-                )
+                raise exceptions.ValidationError(RECIPE_IN_THE_BASKET)
 
             ShoppingCart.objects.create(user=user, recipe=recipe)
             serializer = ShortRecipeSerializer(
@@ -95,7 +96,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 recipe=recipe
             ).exists():
                 raise exceptions.ValidationError(
-                    'Рецепта нет в списке покупок, либо он уже удален.'
+                    THE_RECIPE_HAS_BEEN_REMOVED_FROM_THE_TRASH
                 )
 
             shopping_cart = get_object_or_404(

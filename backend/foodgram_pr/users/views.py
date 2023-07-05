@@ -1,10 +1,6 @@
-# from django.db.models.signals import post_save
-# from django.dispatch import receiver
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
-# from recipes.models import ShoppingCart
 from rest_framework import exceptions
-# from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
@@ -16,14 +12,9 @@ from .models import Subscription, User
 from .pagination import CustomPageNumberPagination
 from .serializers import CustomUserSerializer, SubscriptionSerializer
 
-# class TokenCreateWithCheckBlockStatusView(TokenCreateView):
-#     def _action(self, serializer):
-#         if serializer.user.is_blocked:
-#             return Response(
-#                 {'errors': 'аккаунт заблокирован!'},
-#                 status=HTTP_400_BAD_REQUEST,
-#             )
-#         return super()._action(serializer)
+YOU_CANNOT_SUBSCRIBE_TO_YOURSELF = 'Подписатся на самого себя нельзя.'
+SUBSCRIPTION_IS_ISSUED = 'Подписка уже оформлена.'
+NO_SIGNATURE = 'Вы не подписаны на этого автора.'
 
 
 class UserSubscribeViewSet(UserViewSet):
@@ -40,10 +31,6 @@ class UserSubscribeViewSet(UserViewSet):
         permission_classes=(IsAuthenticated, )
     )
     def subscriptions(self, request):
-        # user = self.request.user
-        # user_subscriptions = user.subscribers.all()
-        # authors = [item.author.id for item in user_subscriptions]
-        # queryset = User.objects.filter(pk__in=authors)
         queryset = User.objects.filter(subscribers__user=self.request.user)
         paginated_queryset = self.paginate_queryset(queryset)
         serializer = self.get_serializer(paginated_queryset, many=True)
@@ -62,13 +49,13 @@ class UserSubscribeViewSet(UserViewSet):
         if self.request.method == 'POST':
             if user == author:
                 raise exceptions.ValidationError(
-                    'Подписатся на самого себя нельзя.'
+                    YOU_CANNOT_SUBSCRIBE_TO_YOURSELF
                 )
             if Subscription.objects.filter(
                 user=user,
                 author=author
             ).exists():
-                raise exceptions.ValidationError('Подписка уже оформлена.')
+                raise exceptions.ValidationError(SUBSCRIPTION_IS_ISSUED)
 
             Subscription.objects.create(user=user, author=author)
             serializer = self.get_serializer(author)
@@ -78,9 +65,7 @@ class UserSubscribeViewSet(UserViewSet):
         if request.method == 'DELETE':
             instance = user.subscribes.filter(author=author)
             if not instance:
-                raise exceptions.ValidationError(
-                            'Вы не подписаны на этого автора.'
-                )
+                raise exceptions.ValidationError(NO_SIGNATURE)
             instance.delete()
             return Response(status=HTTP_204_NO_CONTENT)
 
