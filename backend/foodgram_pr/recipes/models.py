@@ -4,6 +4,8 @@ from django.db import models
 from ingredients.models import Ingredient
 from tags.models import Tag
 
+from .serializers.recipes import COOKING_TIME_MIN
+
 User = get_user_model()
 
 
@@ -25,7 +27,7 @@ class Recipe(models.Model):
         help_text='Список ингредиентов',
     )
     cooking_time = models.PositiveSmallIntegerField(
-        validators=(MinValueValidator(1),),
+        validators=(MinValueValidator(COOKING_TIME_MIN),),
         verbose_name='Время приготовления (в минутах)',
         help_text='Время приготовления (в минутах)',
     )
@@ -77,7 +79,7 @@ class RecipeIngredients(models.Model):
     )
 
     class Meta:
-        ordering = ('ingredient',)
+        # ordering = ('ingredient',)
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
 

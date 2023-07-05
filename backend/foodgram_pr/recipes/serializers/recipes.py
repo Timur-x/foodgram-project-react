@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
@@ -12,6 +13,8 @@ from users.serializers import CustomUserSerializer
 
 from ..models import (Favorite, Recipe, RecipeIngredients, RecipeTags,
                       ShoppingCart)
+
+User = get_user_model()
 
 COOKING_TIME_ERROR = (
     'Время приготовления должно составлять не менее 1 минуты',
@@ -139,7 +142,8 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
             MaxValueValidator(
                 MAX_COOKING_TIME,
                 message=COOKING_TIME_ERROR)
-             ))
+             )
+         )
 
     def validate_tags(self, value):
         if not value:
