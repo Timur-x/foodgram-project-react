@@ -71,3 +71,4 @@ class UserSubscribeViewSet(UserViewSet):
                 request.user,
                 request,
             )
+        return None
