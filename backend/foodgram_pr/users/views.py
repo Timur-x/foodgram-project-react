@@ -75,19 +75,13 @@ class UserSubscribeViewSet(UserViewSet):
 
             return Response(serializer.data, status=HTTP_201_CREATED)
 
-        if self.request.method == 'DELETE':
-            if not user.subscribes.filter(author=author).exists():
+        if request.method == 'DELETE':
+            instance = user.subscribes.filter(author=author)
+            if not instance:
                 raise exceptions.ValidationError(
-                    'Подписка уже удалена.'
+                            'Вы не подписаны на этого автора.'
                 )
-
-            subscription = get_object_or_404(
-                Subscription,
-                user=user,
-                author=author
-            )
-            subscription.delete()
-
+            instance.delete()
             return Response(status=HTTP_204_NO_CONTENT)
 
         return Response(status=HTTP_405_METHOD_NOT_ALLOWED)
