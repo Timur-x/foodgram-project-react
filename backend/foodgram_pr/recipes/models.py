@@ -1,10 +1,12 @@
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 from ingredients.models import Ingredient
 from tags.models import Tag
-from users.models import User
 
 TIME_MIN = 1
+
+User = get_user_model()
 
 
 class Recipe(models.Model):
@@ -131,35 +133,6 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f'Рецепт {self.recipe} в избранном у {self.user}'
-
-
-class ShoppingCart(models.Model):
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        related_name='shopping_list',
-        verbose_name='Пользователь'
-    )
-    recipe = models.ManyToManyField(
-        'recipes.Recipe',
-        on_delete=models.CASCADE,
-        related_name='in_shopping_list',
-        verbose_name='Рецепт'
-    )
-
-    class Meta:
-        verbose_name = 'Список'
-        verbose_name_plural = 'Список'
-
-        constraints = (
-            models.UniqueConstraint(
-                fields=('user', 'recipe'),
-                name='unique_shopping_list_recipe'
-            ),
-        )
-
-    def __str__(self):
-        return f'Рецепт {self.recipe} в списке покупок у {self.user}'
 
 
 class CountOfIngredient(models.Model):
