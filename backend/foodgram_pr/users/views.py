@@ -1,18 +1,18 @@
 # from django.db.models.signals import post_save
 # from django.dispatch import receiver
-from django.shortcuts import get_object_or_404
+# from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 # from recipes.models import ShoppingCart
-from rest_framework import exceptions
+# from rest_framework import exceptions
 # from rest_framework.authtoken.models import Token
+from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
-from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
-                                   HTTP_405_METHOD_NOT_ALLOWED)
+from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
-from .models import Subscription, User
+from .models import User
 from .pagination import CustomPageNumberPagination
 from .serializers import CustomUserSerializer, SubscriptionSerializer
 
@@ -57,37 +57,25 @@ class UserSubscribeViewSet(UserViewSet):
     )
     def subscribe(self, request, id=None):
         user = self.request.user
-        author = get_object_or_404(User, pk=id)
-
-        if self.request.method == 'POST':
-            if user == author:
-                raise exceptions.ValidationError(
-                    'Подписатся на самого себя нельзя.'
+        author = self.get_object()
+        if request.method == 'DELETE':
+            instance = user.following.filter(author=author)
+            if not instance:
+                raise serializers.ValidationError(
+                    {
+                        'errors': [
+                            'Вы не подписаны на этого автора.'
+                        ]
+                    }
                 )
-            if Subscription.objects.filter(
-                user=user,
-                author=author
-            ).exists():
-                raise exceptions.ValidationError('Подписка уже оформлена.')
-
-            Subscription.objects.create(user=user, author=author)
-            serializer = self.get_serializer(author)
-
-            return Response(serializer.data, status=HTTP_201_CREATED)
-
-        if self.request.method == 'DELETE':
-            if not user.subscribers.filter(author=author).exists():
-                raise exceptions.ValidationError(
-                    'Подписка уже удалена.'
-                )
-
-            subscription = get_object_or_404(
-                Subscription,
-                user=user,
-                author=author
-            )
-            subscription.delete()
-
+            instance.delete()
             return Response(status=HTTP_204_NO_CONTENT)
-
-        return Response(status=HTTP_405_METHOD_NOT_ALLOWED)
+        data = {
+            'user': user.id,
+            'author': id
+        }
+        subscription = SubscriptionSerializer(data=data)
+        subscription.is_valid(raise_exception=True)
+        subscription.save()
+        serializer = self.get_serializer(author)
+        return Response(serializer.data, status=HTTP_201_CREATED)
