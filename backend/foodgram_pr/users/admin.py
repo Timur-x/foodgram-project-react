@@ -1,9 +1,10 @@
 from django.contrib.admin import ModelAdmin, register
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Count, Sum
+from recipes.models import ShoppingCart
 
 from .forms import CustomUserChangeForm, CustomUserCreationForm
-from .models import ShoppingCart, Subscription, User
+from .models import Subscription, User
 
 
 @register(User)

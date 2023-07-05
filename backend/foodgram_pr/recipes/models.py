@@ -135,6 +135,36 @@ class Favorite(models.Model):
         return f'Рецепт {self.recipe} в избранном у {self.user}'
 
 
+class ShoppingCart(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='shopping_list',
+        verbose_name='Пользователь'
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='in_shopping_list',
+        verbose_name='Рецепт'
+    )
+
+    class Meta:
+        ordering = ('-user',)
+        verbose_name = 'Список'
+        verbose_name_plural = 'Список'
+
+        constraints = (
+            models.UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='unique_shopping_list_recipe'
+            ),
+        )
+
+    def __str__(self):
+        return f'Рецепт {self.recipe} в списке покупок у {self.user}'
+
+
 class CountOfIngredient(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
