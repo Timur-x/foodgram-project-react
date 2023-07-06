@@ -1,6 +1,8 @@
-from django.contrib.admin import ModelAdmin, TabularInline, register
+from django.contrib.admin import ModelAdmin, TabularInline, display, register
 
-from .models import Recipe
+from .models import CountOfIngredient, Favorite, Recipe
+
+EMPTY = '< Пусто >'
 
 
 class RecipeIngredientsInLine(TabularInline):
@@ -23,3 +25,31 @@ class RecipeAdmin(ModelAdmin):
     def in_favorites(self, obj):
         return obj.favorites.count()
     in_favorites.short_description = 'Общее число добавлений в избранное'
+
+
+@register(Favorite)
+class FavoriteAdmin(ModelAdmin):
+    list_display = ('user', 'recipe',)
+    list_filter = ('user', 'recipe',)
+
+
+@register(CountOfIngredient)
+class CountOfIngredientAdmin(ModelAdmin):
+    list_display = (
+        'id', 'ingredient', 'amount', 'get_measurement_unit',
+        'get_recipes_count',
+    )
+    readonly_fields = ('get_measurement_unit',)
+    list_filter = ('ingredient',)
+    ordering = ('ingredient',)
+
+    @display(description='Единица измерения')
+    def get_measurement_unit(self, obj):
+        try:
+            return obj.ingredient.measurement_unit
+        except CountOfIngredient.ingredient.RelatedObjectDoesNotExist:
+            return EMPTY
+
+    @display(description='Количество ссылок в рецептах')
+    def get_recipes_count(self, obj):
+        return obj.recipes.count()
