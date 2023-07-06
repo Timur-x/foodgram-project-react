@@ -15,7 +15,7 @@ from .permissions import IsAuthorOrAdminPermission
 from .serializers.recipes import RecipeCreateUpdateSerializer, RecipeSerializer
 from .serializers.shortrecipes import ShortRecipeSerializer
 
-FILE_NAME = 'Cписок покупок:'
+FILE_NAME = 'Cписок покупок.txt'
 RECIPE_iIN_FAVORITES = 'Рецепт уже в избранном.'
 RECIPE_DELETED = 'Рецепта нет в избранном, либо он уже удален.'
 RECIPE_IN_THE_BASKET = 'Рецепт уже в списке покупок.'
