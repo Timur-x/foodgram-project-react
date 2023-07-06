@@ -56,5 +56,5 @@ class ShoppingCartAdmin(ModelAdmin):
 
     def count_ingredients(self, obj):
         return (
-            obj.recipe.recipeingredients.aggregate(
-                total=Sum('ingredient__count_in_recipes'))['total'])
+            obj.recipe.ingredients.aggregate(total=Sum(
+                'recipeingredient__quantity'))['total'])
