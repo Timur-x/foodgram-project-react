@@ -43,13 +43,13 @@ class CountOfIngredientAdmin(ModelAdmin):
     list_filter = ('ingredient',)
     ordering = ('ingredient',)
 
-    @display(description='Единица измерения')
     def get_measurement_unit(self, obj):
         try:
             return obj.ingredient.measurement_unit
         except CountOfIngredient.ingredient.RelatedObjectDoesNotExist:
-            return EMPTY
+            return 'EMPTY'
+    get_measurement_unit.short_description = 'Единица измерения'
 
-    @display(description='Количество ссылок в рецептах')
     def get_recipes_count(self, obj):
         return obj.recipes.count()
+    get_recipes_count.short_description = 'Количество ссылок в рецептах'
