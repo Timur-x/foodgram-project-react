@@ -51,5 +51,5 @@ class CountOfIngredientAdmin(ModelAdmin):
     get_measurement_unit.short_description = 'Единица измерения'
 
     def get_recipes_count(self, obj):
-        return obj.recipes.count()
+        return obj.recipes.all().count()
     get_recipes_count.short_description = 'Количество ссылок в рецептах'
