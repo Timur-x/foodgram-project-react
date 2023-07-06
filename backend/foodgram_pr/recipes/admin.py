@@ -17,10 +17,14 @@ class RecipeTagsInLine(TabularInline):
 
 @register(Recipe)
 class RecipeAdmin(ModelAdmin):
-    list_display = ('name', 'author')
+    list_display = ('display_name', 'author')
     list_filter = ('name', 'author', 'tags',)
     readonly_fields = ('in_favorite',)
     inlines = (RecipeIngredientsInLine, RecipeTagsInLine)
+
+    def display_name(self, obj):
+        return obj.name
+    display_name.short_description = 'Name'
 
     def in_favorites(self, obj):
         return obj.favorites.count()
