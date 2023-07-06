@@ -106,15 +106,20 @@ class RecipeSerializer(ModelSerializer):
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context['request'].user
-
         if user.is_anonymous:
             return False
-
-        return ShoppingCart.objects.filter(user=user, recipe=obj).exists()
+        if not hasattr(obj, 'pk'):
+            return False
+        if ShoppingCart.objects.filter(user=user, recipe=obj).exists():
+            return True
+        return False
 
     class Meta:
         model = Recipe
-        exclude = ('pub_date',)
+        fields = (
+            'id', 'tags', 'author', 'ingredients', 'is_favorited',
+            'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time',
+        )
 
 
 class RecipeCreateUpdateSerializer(ModelSerializer):
