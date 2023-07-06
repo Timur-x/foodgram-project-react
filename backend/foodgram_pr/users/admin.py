@@ -1,8 +1,8 @@
 from django.contrib.admin import ModelAdmin, register
 from django.contrib.auth.admin import UserAdmin
-from django.db.models import Sum
-from recipes.models import ShoppingCart
 
+# from django.db.models import Sum
+# from recipes.models import ShoppingCart
 from .forms import CustomUserChangeForm, CustomUserCreationForm
 from .models import Subscription, User
 
@@ -44,15 +44,15 @@ class SubscriptionAdmin(ModelAdmin):
     search_fields = ('user', 'author')
 
 
-@register(ShoppingCart)
-class ShoppingCartAdmin(ModelAdmin):
-    list_display = ('user', 'count_ingredients',)
-    readonly_fields = ('count_ingredients',)
-    empty_value_display = 'Пусто'
+# @register(ShoppingCart)
+# class ShoppingCartAdmin(ModelAdmin):
+#     list_display = ('user', 'count_ingredients',)
+#     readonly_fields = ('count_ingredients',)
+#     empty_value_display = 'Пусто'
 
-    class Meta:
-        verbose_name = 'Список'
-        verbose_name_plural = 'Списки'
+#     class Meta:
+#         verbose_name = 'Список'
+#         verbose_name_plural = 'Списки'
 
-    def count_ingredients(self, obj):
-        return obj.recipes.aggregate(total=Sum('ingredients__count'))['total']
+#     def count_ingredients(self, obj):
+#         return obj.recipe.aggregate(total=Sum('ingredients__count'))['total']
