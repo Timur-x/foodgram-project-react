@@ -142,9 +142,8 @@ class ShoppingCart(models.Model):
         related_name='shopping_list',
         verbose_name='Пользователь'
     )
-    recipe = models.ForeignKey(
+    recipe = models.ManyToManyField(
         Recipe,
-        on_delete=models.CASCADE,
         related_name='in_shopping_list',
         verbose_name='Рецепт'
     )
