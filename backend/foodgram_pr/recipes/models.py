@@ -20,7 +20,7 @@ class Recipe(models.Model):
         help_text='Описание',
     )
     ingredients = models.ManyToManyField(
-        Ingredient,
+        'CountOfIngredient',
         through='RecipeIngredients',
         related_name='recipes',
         verbose_name='Список ингредиентов',
