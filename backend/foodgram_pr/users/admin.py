@@ -55,4 +55,6 @@ class ShoppingCartAdmin(ModelAdmin):
         verbose_name_plural = 'Списки'
 
     def count_ingredients(self, obj):
-        return obj.recipe.ingredients.aggregate(total=Sum('count'))['total']
+        return (
+            obj.recipe.recipeingredients.aggregate(total=Sum('quantity'))
+            ['total'])
