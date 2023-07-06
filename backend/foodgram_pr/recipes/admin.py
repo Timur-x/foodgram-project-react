@@ -1,6 +1,6 @@
 from django.contrib.admin import ModelAdmin, register
 
-from .models import CountOfIngredient, Favorite, Recipe
+from .models import Favorite, Recipe
 
 EMPTY = '< Пусто >'
 
@@ -33,23 +33,23 @@ class FavoriteAdmin(ModelAdmin):
     list_filter = ('user', 'recipe',)
 
 
-@register(CountOfIngredient)
-class CountOfIngredientAdmin(ModelAdmin):
-    list_display = (
-        'id', 'ingredient', 'amount', 'get_measurement_unit',
-        'get_recipes_count',
-    )
-    readonly_fields = ('get_measurement_unit',)
-    list_filter = ('ingredient',)
-    ordering = ('ingredient',)
+# @register(CountOfIngredient)
+# class CountOfIngredientAdmin(ModelAdmin):
+#     list_display = (
+#         'id', 'ingredient', 'amount', 'get_measurement_unit',
+#         'get_recipes_count',
+#     )
+#     readonly_fields = ('get_measurement_unit',)
+#     list_filter = ('ingredient',)
+#     ordering = ('ingredient',)
 
-    def get_measurement_unit(self, obj):
-        try:
-            return obj.ingredient.measurement_unit
-        except CountOfIngredient.ingredient.RelatedObjectDoesNotExist:
-            return EMPTY
-    get_measurement_unit.short_description = 'Единица измерения'
+#     def get_measurement_unit(self, obj):
+#         try:
+#             return obj.ingredient.measurement_unit
+#         except CountOfIngredient.ingredient.RelatedObjectDoesNotExist:
+#             return EMPTY
+#     get_measurement_unit.short_description = 'Единица измерения'
 
-    def get_recipes_count(self, obj):
-        return obj.ingredient.count_in_recipes.count()
-    get_recipes_count.short_description = 'Количество ссылок в рецептах'
+#     def get_recipes_count(self, obj):
+#         return obj.ingredient.count_in_recipes.count()
+#     get_recipes_count.short_description = 'Количество ссылок в рецептах'
