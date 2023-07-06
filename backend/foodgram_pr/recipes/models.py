@@ -142,7 +142,7 @@ class ShoppingCart(models.Model):
         related_name='shopping_list',
         verbose_name='Пользователь'
     )
-    recipes = models.ManyToManyField(
+    recipe = models.ManyToManyField(
         Recipe,
         related_name='in_shopping_list',
         verbose_name='Рецепт'
