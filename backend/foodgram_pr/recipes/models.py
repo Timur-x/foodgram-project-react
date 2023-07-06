@@ -142,9 +142,8 @@ class ShoppingCart(models.Model):
         related_name='shopping_list',
         verbose_name='Пользователь'
     )
-    recipe = models.ForeignKey(
+    recipes = models.ManyToManyField(
         Recipe,
-        on_delete=models.CASCADE,
         related_name='in_shopping_list',
         verbose_name='Рецепт'
     )
@@ -162,7 +161,7 @@ class ShoppingCart(models.Model):
         )
 
     def __str__(self):
-        return f'Рецепт {self.recipe} в списке покупок у {self.user}'
+        return f'Список покупок для {self.user}'
 
 
 class CountOfIngredient(models.Model):
