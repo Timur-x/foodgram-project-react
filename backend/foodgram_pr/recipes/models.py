@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.urls import reverse
 from ingredients.models import Ingredient
 from tags.models import Tag
 
@@ -62,9 +61,6 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
-
-    def get_admin_url(self):
-        return reverse('admin:recipes_recipe_edit', args=[self.pk])
 
 
 class RecipeIngredients(models.Model):
