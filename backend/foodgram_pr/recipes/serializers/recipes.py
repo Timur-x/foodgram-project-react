@@ -1,5 +1,6 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.shortcuts import get_object_or_404
+from django.utils.text import slugify
 from drf_extra_fields.fields import Base64ImageField
 from ingredients.models import Ingredient
 from rest_framework.exceptions import ValidationError
@@ -179,7 +180,8 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
     def add_tags(self, recipe, tags):
         tag_objs = []
         for tag_data in tags:
-            tag = Tag.objects.create(name=tag_data)
+            slug = slugify(tag_data)
+            tag = Tag.objects.create(name=tag_data, slug=slug)
             tag_objs.append(tag)
         recipe_tags = [RecipeTags(recipe=recipe, tag=tag) for tag in tag_objs]
         RecipeTags.objects.bulk_create(recipe_tags)
