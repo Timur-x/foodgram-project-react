@@ -31,10 +31,9 @@ class UserSubscribeViewSet(UserViewSet):
         permission_classes=(IsAuthenticated, )
     )
     def subscriptions(self, request):
-        queryset = User.objects.filter(subscribers__user=self.request.user)
+        queryset = Subscription.objects.filter(user=self.request.user).select_related('author')
         paginated_queryset = self.paginate_queryset(queryset)
         serializer = self.get_serializer(paginated_queryset, many=True)
-
         return self.get_paginated_response(serializer.data)
 
     @action(
@@ -45,7 +44,6 @@ class UserSubscribeViewSet(UserViewSet):
     def subscribe(self, request, id=None):
         user = self.request.user
         author = get_object_or_404(User, pk=id)
-
         if self.request.method == 'POST':
             if user == author:
                 raise exceptions.ValidationError(
@@ -56,17 +54,13 @@ class UserSubscribeViewSet(UserViewSet):
                 author=author
             ).exists():
                 raise exceptions.ValidationError(SUBSCRIPTION_IS_ISSUED)
-
             Subscription.objects.create(user=user, author=author)
-            serializer = self.get_serializer(author)
-
+            serializer = self.get_serializer(instance=author)
             return Response(serializer.data, status=HTTP_201_CREATED)
-
         if request.method == 'DELETE':
             instance = user.subscribes.filter(author=author)
             if not instance:
                 raise exceptions.ValidationError(NO_SIGNATURE)
             instance.delete()
             return Response(status=HTTP_204_NO_CONTENT)
-
         return Response(status=HTTP_405_METHOD_NOT_ALLOWED)
