@@ -20,7 +20,7 @@ class RecipeAdmin(ModelAdmin):
     list_display = ('name', 'author')
     list_filter = ('name', 'author', 'tags',)
     readonly_fields = ('in_favorites',)
-    # inlines = (RecipeIngredientsInLine, RecipeTagsInLine)
+    inlines = (RecipeIngredientsInLine, RecipeTagsInLine)
 
     def in_favorites(self, obj):
         return obj.favorites.count()
