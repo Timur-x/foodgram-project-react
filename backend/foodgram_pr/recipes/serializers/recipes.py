@@ -188,13 +188,19 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
         RecipeTags.objects.bulk_create(recipe_tags)
 
     def add_ingredients(self, recipe, ingredients):
-        ingredient_objs = [Ingredient(**data) for data in ingredients]
-        Ingredient.objects.bulk_create(ingredient_objs)
-        recipe_ingredients = [RecipeIngredients(
-            recipe=recipe,
-            ingredient=ingredient
-             ) for ingredient in ingredient_objs]
-        RecipeIngredients.objects.bulk_create(recipe_ingredients)
+        ingredient_objs = []
+        for data in ingredients:
+            if isinstance(data, dict) and all(
+                   key in data for key in ['name', 'unit']):
+                ingredient = Ingredient.objects.create(
+                    name=data['name'],
+                    unit=data['unit']
+                )
+                ingredient_objs.append(ingredient)
+        RecipeIngredients.objects.bulk_create([
+            RecipeIngredients(recipe=recipe, ingredient=ingredient)
+            for ingredient in ingredient_objs
+        ])
 
     def update(self, instance, validated_data):
         tags = validated_data.pop('tags', None)
