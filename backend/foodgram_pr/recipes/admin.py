@@ -18,13 +18,13 @@ class RecipeTagsInLine(TabularInline):
 @register(Recipe)
 class RecipeAdmin(ModelAdmin):
     list_display = ('name', 'author')
-    # list_filter = ('name', 'author', 'tags',)
-    # readonly_fields = ('in_favorite',)
+    list_filter = ('name', 'author', 'tags',)
+    readonly_fields = ('in_favorite',)
     # inlines = (RecipeIngredientsInLine, RecipeTagsInLine)
 
-    # def in_favorites(self, obj):
-    #     return obj.favorites.count()
-    # in_favorites.short_description = 'Общее число добавлений в избранное'
+    def in_favorites(self, obj):
+        return obj.favorites.count
+    in_favorites.short_description = 'Общее число добавлений в избранное'
 
 
 @register(Favorite)
