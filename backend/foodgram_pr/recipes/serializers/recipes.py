@@ -176,8 +176,11 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
         return recipe
 
     def add_tags(self, recipe, tags):
-        tag_objs = [Tag(**data) for data in tags]
-        Tag.objects.bulk_create(tag_objs)
+        tag_objs = []
+        for tag_data in tags:
+            tag_data_dict = {'name': tag_data}
+            tag = Tag.objects.create(**tag_data_dict)
+            tag_objs.append(tag)
         recipe_tags = [RecipeTags(recipe=recipe, tag=tag) for tag in tag_objs]
         RecipeTags.objects.bulk_create(recipe_tags)
 
