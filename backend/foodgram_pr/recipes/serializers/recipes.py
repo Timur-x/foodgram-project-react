@@ -29,7 +29,7 @@ INGREDIENT_MIN_AMOUNT_ERROR = (
 )
 INGREDIENT_MAX_AMOUNT_ERROR = (
     'Количество ингредиента не может быть больше 32000!'
-    )
+)
 
 
 class RecipeIngredientsSerializer(ModelSerializer):
@@ -138,9 +138,10 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
             ),
             MaxValueValidator(
                 MAX_COOKING_TIME,
-                message=COOKING_TIME_ERROR)
+                message=COOKING_TIME_ERROR
             )
         )
+    )
 
     def validate_tags(self, value):
         if not value:
