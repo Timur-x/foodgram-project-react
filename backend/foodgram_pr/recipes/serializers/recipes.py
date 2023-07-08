@@ -160,7 +160,9 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
     def create(self, validated_data):
         tags_list = validated_data.pop('tags')
         ingredient_list = validated_data.pop('ingredients')
-        author_id = validated_data.get('author', {}).get('id')
+        author_id = validated_data.get('author_id')
+        if author_id is None:
+            raise ValidationError('Требуется идентификатор автора.')
         recipe = Recipe.objects.create(author_id=author_id, **validated_data)
         for item in ingredient_list:
             ingredient = get_object_or_404(Ingredient, id=item.get('id'))
