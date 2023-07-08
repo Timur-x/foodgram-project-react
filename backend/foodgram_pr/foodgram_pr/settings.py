@@ -8,7 +8,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='django-insecure-hkvr6s0x!02fbey3^r
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', 'foodgram.ddns.net']
 
 
 INSTALLED_APPS = [
