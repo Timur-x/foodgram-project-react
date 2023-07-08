@@ -110,11 +110,11 @@ Python, Django, Django Rest Framework, Docker, Gunicorn, NGINX, PostgreSQL, Ян
 пример запроса:
 
 > {
->   "email": "vpupkin@yandex.ru",
->   "username": "vasya.pupkin",
->   "first_name": "Вася",
->   "last_name": "Пупкин",
->   "password": "Qwerty123"
+> "email": "vpupkin@yandex.ru",
+> "username": "vasya.pupkin",
+> "first_name": "Вася",
+> "last_name": "Пупкин",
+> "password": "Qwerty123"
 > }
 
 Получить авторизационный токен, отправив POST-запрос на эндпоинт:
@@ -124,23 +124,21 @@ Python, Django, Django Rest Framework, Docker, Gunicorn, NGINX, PostgreSQL, Ян
 пример запроса:
 
 > {
->   "password": "string",
->   "email": "string"
+> "password": "string",
+> "email": "string"
 > }
 
 ---
 
 ---
 
+Проект развернут по IP :http://158.160.108.93/
 
+Доступ в админ-панель: 
 
-Проект развернут по IP :
-
-Доступ в админ-панель:
-
+пароль: Qwerty123w
+Почта: 123@q.ru
 
 ---
-
-
 
 **Автор:  [Николаев Т.А](https://github.com/Timur-x)**
