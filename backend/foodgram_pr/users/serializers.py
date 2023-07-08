@@ -15,7 +15,7 @@ class CustomUserSerializer(UserSerializer):
     class Meta:
         model = User
         fields = (
-            'id', 'email', 'username', 'first_name', 'last_name', 'password',
+            'email', 'id', 'username', 'first_name', 'last_name', 'password',
             'is_subscribed',
         )
         extra_kwargs = {
@@ -55,7 +55,7 @@ class SubscriptionSerializer(CustomUserSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email',
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',
                   'is_subscribed', 'recipes', 'recipes_count')
 
     def get_recipes_count(self, obj):
