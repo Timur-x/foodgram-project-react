@@ -158,24 +158,23 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
         return value
 
     def create(self, validated_data):
-        tags_list = validated_data.pop('tags')
-        ingredient_list = validated_data.pop('ingredients')
-        author_id = validated_data.get('author_id')
-        if author_id is None:
-            raise ValidationError('Требуется идентификатор автора.')
-        recipe = Recipe.objects.create(author_id=author_id, **validated_data)
-        for item in ingredient_list:
-            ingredient = get_object_or_404(Ingredient, id=item.get('id'))
+        author = self.context.get('request').user
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
+
+        recipe = Recipe.objects.create(author=author, **validated_data)
+        recipe.tags.set(tags)
+
+        for ingredient in ingredients:
+            amount = ingredient['amount']
+            ingredient = get_object_or_404(Ingredient, pk=ingredient['id'])
+
             RecipeIngredients.objects.create(
-                ingredient=ingredient,
                 recipe=recipe,
-                amount=item.get('amount')
+                ingredient=ingredient,
+                amount=amount
             )
-        for item in tags_list:
-            RecipeTags.objects.create(
-                tag=item,
-                recipe=recipe
-            )
+
         return recipe
 
     def add_tags(self, recipe, tags):
