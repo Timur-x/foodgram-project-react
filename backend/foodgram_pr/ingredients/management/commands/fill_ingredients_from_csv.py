@@ -1,7 +1,6 @@
 import csv
 
 from django.core.management.base import BaseCommand
-
 from ingredients.models import Ingredient
 
 
@@ -14,20 +13,18 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         print('Заполнение модели Ingredient из csv запущено.')
         file_path = options['path'] + 'ingredients.csv'
+        ingredients = []
         with open(file_path, 'r') as csv_file:
             reader = csv.reader(csv_file)
 
             for row in reader:
                 try:
-                    obj, created = Ingredient.objects.get_or_create(
+                    ingredient = Ingredient(
                         name=row[0],
                         measurement_unit=row[1],
                     )
-                    if not created:
-                        print(
-                            f'Ингредиент {obj} уже существует в базе данных.'
-                        )
+                    ingredients.append(ingredient)
                 except Exception as error:
                     print(f'Ошибка в строке {row}: {error}')
-
+        Ingredient.objects.bulk_create(ingredients)
         print('Заполнение модели Ingredient завершено.')

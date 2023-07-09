@@ -96,13 +96,11 @@ class RecipeSerializer(ModelSerializer):
         user = self.context['request'].user
         if user.is_anonymous:
             return False
-
         if not hasattr(obj, 'pk'):
             return False
-        if Favorite.objects.filter(user=user, recipe=obj).exists():
-            return True
-
-        return False
+        return Favorite.objects.filter(
+            user=user,
+            in_favorite=obj).exists()
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context['request'].user
@@ -110,9 +108,9 @@ class RecipeSerializer(ModelSerializer):
             return False
         if not hasattr(obj, 'pk'):
             return False
-        if ShoppingCart.objects.filter(user=user, recipe=obj).exists():
-            return True
-        return False
+        return ShoppingCart.objects.filter(
+            user=user,
+            in_shopping_list=obj).exists()
 
     class Meta:
         model = Recipe
@@ -162,20 +160,9 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
         author = self.context.get('request').user
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
-
         recipe = Recipe.objects.create(author=author, **validated_data)
         recipe.tags.set(tags)
-
-        for ingredient in ingredients:
-            amount = ingredient['amount']
-            ingredient = get_object_or_404(Ingredient, pk=ingredient['id'])
-
-            RecipeIngredients.objects.create(
-                recipe=recipe,
-                ingredient=ingredient,
-                amount=amount
-            )
-
+        self.add_ingredients(recipe, ingredients)
         return recipe
 
     def add_tags(self, recipe, tags):
@@ -213,7 +200,6 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
 
         ingredients = validated_data.pop('ingredients', None)
         if ingredients is not None:
-            self.add_ingredients(instance, ingredients)
             instance.ingredients.clear()
             for ingredient in ingredients:
                 amount = ingredient['amount']
@@ -223,7 +209,6 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
                     ingredient=ingredient,
                     defaults={'amount': amount}
                 )
-
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
