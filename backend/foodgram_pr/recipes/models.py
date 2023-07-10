@@ -4,8 +4,8 @@ from django.db import models
 from ingredients.models import Ingredient
 from tags.models import Tag
 
-TIME_MIN = 1
-TIME_MAX = 32000
+MIN = 1
+MAX = 32000
 
 User = get_user_model()
 
@@ -28,7 +28,7 @@ class Recipe(models.Model):
         help_text='Список ингредиентов',
     )
     cooking_time = models.PositiveSmallIntegerField(
-        validators=(MinValueValidator(TIME_MIN), MaxValueValidator(TIME_MAX),),
+        validators=(MinValueValidator(MIN), MaxValueValidator(MAX),),
         verbose_name='Время приготовления (в минутах)',
         help_text='Время приготовления (в минутах)',
     )
@@ -76,6 +76,7 @@ class RecipeIngredients(models.Model):
         verbose_name='Ингредиент'
     )
     amount = models.PositiveSmallIntegerField(
+        validators=(MinValueValidator(MIN), MaxValueValidator(MAX),),
         verbose_name='Количество'
     )
 
