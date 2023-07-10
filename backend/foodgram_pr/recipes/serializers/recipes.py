@@ -137,11 +137,11 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         ]
     )
 
-    def validate(self, attrs):
-        cooking_time = attrs.get('cooking_time')
-        if cooking_time and (cooking_time < 1 or cooking_time > 32000):
-            raise serializers.ValidationError(COOKING_TIME_ERROR)
-        return attrs
+    # def validate(self, attrs):
+    #     cooking_time = attrs.get('cooking_time')
+    #     if cooking_time and (cooking_time < 1 or cooking_time > 32000):
+    #         raise serializers.ValidationError(COOKING_TIME_ERROR)
+    #     return attrs
 
     def validate_tags(self, value):
         if not value:
