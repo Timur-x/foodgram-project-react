@@ -110,7 +110,7 @@ class RecipeSerializer(ModelSerializer):
             return False
         return ShoppingCart.objects.filter(
             user=user,
-            in_shopping_list=obj).exists()
+            recipe=obj).exists()
 
     class Meta:
         model = Recipe
