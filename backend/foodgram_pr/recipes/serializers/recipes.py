@@ -2,10 +2,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from ingredients.models import Ingredient
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from rest_framework.serializers import (IntegerField, ModelSerializer,
-                                        PrimaryKeyRelatedField,
-                                        SerializerMethodField)
 from tags.models import Tag
 from tags.serializers import TagSerializer
 from users.serializers import CustomUserSerializer
@@ -34,10 +32,10 @@ INGREDIENT_MAX_AMOUNT_ERROR = (
 )
 
 
-class RecipeIngredientsSerializer(ModelSerializer):
-    id = SerializerMethodField(method_name='get_id')
-    name = SerializerMethodField(method_name='get_name')
-    measurement_unit = SerializerMethodField(
+class RecipeIngredientsSerializer(serializers.ModelSerializer):
+    id = serializers.SerializerMethodField(method_name='get_id')
+    name = serializers.SerializerMethodField(method_name='get_name')
+    measurement_unit = serializers.SerializerMethodField(
         method_name='get_measurement_unit'
     )
 
@@ -55,9 +53,9 @@ class RecipeIngredientsSerializer(ModelSerializer):
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
-class CreateUpdateRecipeIngredientsSerializer(ModelSerializer):
-    id = IntegerField()
-    amount = IntegerField(
+class CreateUpdateRecipeIngredientsSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+    amount = serializers.IntegerField(
         validators=(
             MinValueValidator(
                 INGREDIENT_MIN_AMOUNT,
@@ -75,16 +73,16 @@ class CreateUpdateRecipeIngredientsSerializer(ModelSerializer):
         fields = ('id', 'amount')
 
 
-class RecipeSerializer(ModelSerializer):
+class RecipeSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     tags = TagSerializer(many=True)
-    ingredients = SerializerMethodField(
+    ingredients = serializers.SerializerMethodField(
         method_name='get_ingredients'
     )
-    is_favorited = SerializerMethodField(
+    is_favorited = serializers.SerializerMethodField(
         method_name='get_is_favorited'
     )
-    is_in_shopping_cart = SerializerMethodField(
+    is_in_shopping_cart = serializers.SerializerMethodField(
         method_name='get_is_in_shopping_cart'
     )
 
@@ -118,15 +116,15 @@ class RecipeSerializer(ModelSerializer):
         )
 
 
-class RecipeCreateUpdateSerializer(ModelSerializer):
+class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
-    tags = PrimaryKeyRelatedField(
+    tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True
     )
     ingredients = CreateUpdateRecipeIngredientsSerializer(many=True)
     image = Base64ImageField()
-    cooking_time = IntegerField(
+    cooking_time = serializers.IntegerField(
         validators=[
             MinValueValidator(
                 COOKING_TIME_MIN,
@@ -142,7 +140,7 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
     def validate(self, attrs):
         cooking_time = attrs.get('cooking_time')
         if cooking_time and (cooking_time < 1 or cooking_time > 32000):
-            raise ValidationError(COOKING_TIME_ERROR)
+            raise serializers.ValidationError(COOKING_TIME_ERROR)
         return attrs
 
     def validate_tags(self, value):
