@@ -1,10 +1,11 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator
+# from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from ingredients.models import Ingredient
 from tags.models import Tag
 
 TIME_MIN = 1
+TIME_MAX = 32000
 
 User = get_user_model()
 
@@ -27,7 +28,8 @@ class Recipe(models.Model):
         help_text='Список ингредиентов',
     )
     cooking_time = models.PositiveSmallIntegerField(
-        validators=(MinValueValidator(TIME_MIN),),
+        # validators=(MinValueValidator(TIME_MIN),
+        # MaxValueValidator(TIME_MAX),),
         verbose_name='Время приготовления (в минутах)',
         help_text='Время приготовления (в минутах)',
     )

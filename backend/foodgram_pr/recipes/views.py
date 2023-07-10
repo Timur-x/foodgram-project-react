@@ -16,9 +16,7 @@ from .serializers.recipes import RecipeCreateUpdateSerializer, RecipeSerializer
 from .serializers.shortrecipes import ShortRecipeSerializer
 
 FILE_NAME = 'Cписок покупок.txt'
-RECIPE_iIN_FAVORITES = 'Рецепт уже в избранном.'
 RECIPE_DELETED = 'Рецепта нет в избранном, либо он уже удален.'
-RECIPE_IN_THE_BASKET = 'Рецепт уже в списке покупок.'
 THE_RECIPE_HAS_BEEN_REMOVED_FROM_THE_TRASH = ('Рецепта нет в списке покупок,'
                                               'либо он уже удален.')
 
@@ -42,12 +40,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, pk=pk)
 
         if self.request.method == 'POST':
-            if Favorite.objects.filter(
-                user=user,
-                recipe=recipe
-            ).exists():
-                raise exceptions.ValidationError(RECIPE_iIN_FAVORITES)
-
             Favorite.objects.create(user=user, recipe=recipe)
             serializer = ShortRecipeSerializer(
                 recipe,
@@ -76,12 +68,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, pk=pk)
 
         if self.request.method == 'POST':
-            if ShoppingCart.objects.filter(
-                user=user,
-                recipe=recipe
-            ).exists():
-                raise exceptions.ValidationError(RECIPE_IN_THE_BASKET)
-
             ShoppingCart.objects.create(user=user, recipe=recipe)
             serializer = ShortRecipeSerializer(
                 recipe,

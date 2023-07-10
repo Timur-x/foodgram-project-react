@@ -10,7 +10,8 @@ from tags.models import Tag
 from tags.serializers import TagSerializer
 from users.serializers import CustomUserSerializer
 
-from ..models import Recipe, RecipeIngredients, RecipeTags
+from ..models import (Favorite, Recipe, RecipeIngredients, RecipeTags,
+                      ShoppingCart)
 
 COOKING_TIME_ERROR = (
     'Время приготовления должно составлять не менее 1 минуты',
@@ -20,6 +21,8 @@ COOKING_TIME_MIN = 1
 MAX_COOKING_TIME = 32000
 INGREDIENT_MIN_AMOUNT = 1
 INGREDIENT_MAX_AMOUNT = 32000
+RECIPE_IN_FAVORITES = 'Рецепт уже в избранном.'
+RECIPE_IN_THE_BASKET = 'Рецепт уже в списке покупок.'
 TAGS_EMPTY_ERROR = 'Рецепт не может быть без тегов!'
 INGREDIENTS_UNIQUE_ERROR = 'Ингредиенты не могут повторяться!'
 INGREDIENTS_EMPTY_ERROR = 'Без ингредиентов рецепта не бывает!'
@@ -155,7 +158,12 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
         author = self.context.get('request').user
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
+        user = self.context['request'].user
         recipe = Recipe.objects.create(author=author, **validated_data)
+        if Favorite.objects.filter(user=user, recipe=recipe).exists():
+            raise ValidationError(RECIPE_IN_FAVORITES)
+        if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
+            raise ValidationError(RECIPE_IN_THE_BASKET)
         recipe.tags.set(tags)
         self.add_ingredients(recipe, ingredients)
         return recipe
