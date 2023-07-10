@@ -98,9 +98,7 @@ class RecipeSerializer(ModelSerializer):
             return False
         if not hasattr(obj, 'pk'):
             return False
-        return Favorite.objects.filter(
-            user=user,
-            recipe=obj).exists()
+        return user.favorites.filter(recipe=obj).exists()
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context['request'].user
@@ -108,9 +106,7 @@ class RecipeSerializer(ModelSerializer):
             return False
         if not hasattr(obj, 'pk'):
             return False
-        return ShoppingCart.objects.filter(
-            user=user,
-            recipe=obj).exists()
+        return user.shopping_list.filter(recipe=obj).exists()
 
     class Meta:
         model = Recipe
