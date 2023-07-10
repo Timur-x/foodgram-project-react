@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from ingredients.models import Ingredient
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
+# from rest_framework.exceptions import ValidationError
 from tags.models import Tag
 from tags.serializers import TagSerializer
 from users.serializers import CustomUserSerializer
@@ -145,7 +145,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
 
     def validate_tags(self, value):
         if not value:
-            raise ValidationError(
+            raise serializers.ValidationError(
                 TAGS_EMPTY_ERROR
             )
 
@@ -153,7 +153,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
 
     def validate_ingredients(self, value):
         if not value:
-            raise ValidationError(
+            raise serializers.ValidationError(
                 INGREDIENTS_EMPTY_ERROR
             )
         return value
@@ -165,9 +165,9 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         recipe = Recipe.objects.create(author=author, **validated_data)
         if Favorite.objects.filter(user=user, recipe=recipe).exists():
-            raise ValidationError(RECIPE_IN_FAVORITES)
+            raise serializers.ValidationError(RECIPE_IN_FAVORITES)
         if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
-            raise ValidationError(RECIPE_IN_THE_BASKET)
+            raise serializers.ValidationError(RECIPE_IN_THE_BASKET)
         recipe.tags.set(tags)
         self.add_ingredients(recipe, ingredients)
         return recipe
