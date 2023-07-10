@@ -10,8 +10,7 @@ from tags.models import Tag
 from tags.serializers import TagSerializer
 from users.serializers import CustomUserSerializer
 
-from ..models import (Favorite, Recipe, RecipeIngredients, RecipeTags,
-                      ShoppingCart)
+from ..models import Recipe, RecipeIngredients, RecipeTags
 
 COOKING_TIME_ERROR = (
     'Время приготовления должно составлять не менее 1 минуты',
