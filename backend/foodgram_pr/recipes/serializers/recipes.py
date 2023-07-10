@@ -127,7 +127,7 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
     ingredients = CreateUpdateRecipeIngredientsSerializer(many=True)
     image = Base64ImageField()
     cooking_time = IntegerField(
-        validators=(
+        validators=[
             MinValueValidator(
                 COOKING_TIME_MIN,
                 message=COOKING_TIME_ERROR
@@ -136,7 +136,7 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
                 MAX_COOKING_TIME,
                 message=COOKING_TIME_ERROR
             )
-        )
+        ]
     )
 
     def validate_tags(self, value):
