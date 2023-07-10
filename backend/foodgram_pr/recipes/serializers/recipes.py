@@ -124,24 +124,24 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     )
     ingredients = CreateUpdateRecipeIngredientsSerializer(many=True)
     image = Base64ImageField()
-    cooking_time = serializers.IntegerField(
-        validators=[
-            MinValueValidator(
-                COOKING_TIME_MIN,
-                message=COOKING_TIME_ERROR
-            ),
-            MaxValueValidator(
-                MAX_COOKING_TIME,
-                message=COOKING_TIME_ERROR
-            )
-        ]
-    )
+    # cooking_time = serializers.IntegerField(
+    #     validators=[
+    #         MinValueValidator(
+    #             COOKING_TIME_MIN,
+    #             message=COOKING_TIME_ERROR
+    #         ),
+    #         MaxValueValidator(
+    #             MAX_COOKING_TIME,
+    #             message=COOKING_TIME_ERROR
+    #         )
+    #     ]
+    # )
 
-    # def validate(self, attrs):
-    #     cooking_time = attrs.get('cooking_time')
-    #     if cooking_time and (cooking_time < 1 or cooking_time > 32000):
-    #         raise serializers.ValidationError(COOKING_TIME_ERROR)
-    #     return attrs
+    def validate(self, attrs):
+        cooking_time = attrs.get('cooking_time')
+        if cooking_time and (cooking_time < 1 or cooking_time > 32000):
+            raise serializers.ValidationError(COOKING_TIME_ERROR)
+        return attrs
 
     def validate_tags(self, value):
         if not value:
