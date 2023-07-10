@@ -3,7 +3,6 @@ from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from ingredients.models import Ingredient
 from rest_framework import serializers
-# from rest_framework.exceptions import ValidationError
 from tags.models import Tag
 from tags.serializers import TagSerializer
 from users.serializers import CustomUserSerializer
@@ -124,18 +123,6 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     )
     ingredients = CreateUpdateRecipeIngredientsSerializer(many=True)
     image = Base64ImageField()
-    # cooking_time = serializers.IntegerField(
-    #     validators=[
-    #         MinValueValidator(
-    #             COOKING_TIME_MIN,
-    #             message=COOKING_TIME_ERROR
-    #         ),
-    #         MaxValueValidator(
-    #             MAX_COOKING_TIME,
-    #             message=COOKING_TIME_ERROR
-    #         )
-    #     ]
-    # )
 
     def validate(self, attrs):
         cooking_time = attrs.get('cooking_time')
