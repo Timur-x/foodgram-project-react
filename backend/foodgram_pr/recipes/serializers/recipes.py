@@ -228,13 +228,4 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = (
-            'ingredients', 'tags', 'image', 'name', 'text', 'cooking_time',
-        )
-        extra_kwargs = {
-            'cooking_time': {
-                'error_messages': {
-                    'min_value': COOKING_TIME_ERROR,
-                }
-            }
-        }
+        exclude = ('pub_date',)
